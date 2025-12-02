@@ -30,7 +30,7 @@ const Index = () => {
     <div className="min-h-screen bg-background flex flex-col">
       <Header />
 
-      <main className="container py-8 flex-1">
+      <main className="container py-6 flex-1">
         <div className="mx-auto max-w-5xl">
           <div className="mb-6 text-center">
             <h2 className="mb-2 text-3xl font-bold tracking-tight">AI Image Playground</h2>

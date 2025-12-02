@@ -8,8 +8,8 @@ const Terms = () => {
   return (
     <div className="min-h-screen bg-background flex flex-col">
       <Header />
-      
-      <main className="container py-8 flex-1">
+
+      <main className="container py-6 flex-1">
         <div className="mx-auto max-w-3xl">
           <Button variant="ghost" size="sm" asChild className="mb-6">
             <Link to="/">
@@ -17,9 +17,9 @@ const Terms = () => {
               Back to Playground
             </Link>
           </Button>
-          
+
           <h1 className="text-3xl font-bold mb-6">Terms of Service</h1>
-          
+
           <div className="prose prose-neutral dark:prose-invert max-w-none space-y-6">
             <p className="text-muted-foreground">
               Last updated: {new Date().toLocaleDateString()}
@@ -85,9 +85,9 @@ const Terms = () => {
               <h2 className="text-xl font-semibold">8. Contact</h2>
               <p className="text-muted-foreground">
                 For questions about these terms, please visit{" "}
-                <a 
-                  href="https://nanobanana.aikit.club" 
-                  target="_blank" 
+                <a
+                  href="https://nanobanana.aikit.club"
+                  target="_blank"
                   rel="noopener noreferrer"
                   className="text-foreground hover:underline"
                 >

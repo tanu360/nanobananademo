@@ -15,7 +15,7 @@ export function Header() {
 
   return (
     <header>
-      <div className="container flex h-12 items-center justify-between">
+      <div className="container flex h-14 items-center justify-between">
         <div className="flex items-center gap-3">
           <span className="text-2xl hover:rotate-12 transition-transform duration-300 cursor-default">🍌</span>
           <h1 className="text-lg font-semibold tracking-tight">Nano Banana Demo</h1>
