@@ -110,7 +110,6 @@ export default {
 					'sans-serif'
 				],
 				serif: [
-					'Crimson Pro',
 					'ui-serif',
 					'Georgia',
 					'Cambria',
@@ -119,7 +118,6 @@ export default {
 					'serif'
 				],
 				mono: [
-					'SF Mono',
 					'ui-monospace',
 					'SFMono-Regular',
 					'Menlo',
@@ -131,6 +129,6 @@ export default {
 				]
 			}
 		}
-  },
+	},
 	plugins: [tailwindcssAnimate],
 } satisfies Config;

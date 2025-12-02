@@ -23,8 +23,44 @@ const TabSkeleton = () => (
   </div>
 );
 
+// State for passing data between tabs
+interface GenerateInitialData {
+  prompt: string;
+  model: string;
+}
+
+interface ImageInitialData {
+  imageUrl: string;
+}
+
 const Index = () => {
   const [activeTab, setActiveTab] = useState("generate");
+
+  // Initial data for tabs from history
+  const [generateInitialData, setGenerateInitialData] = useState<GenerateInitialData | null>(null);
+  const [editInitialData, setEditInitialData] = useState<ImageInitialData | null>(null);
+  const [upscaleInitialData, setUpscaleInitialData] = useState<ImageInitialData | null>(null);
+
+  // Handlers for history actions
+  const handleRegenerate = (prompt: string, model: string) => {
+    setGenerateInitialData({ prompt, model });
+    setActiveTab("generate");
+  };
+
+  const handleEditFromHistory = (imageUrl: string) => {
+    setEditInitialData({ imageUrl });
+    setActiveTab("edit");
+  };
+
+  const handleUpscaleFromHistory = (imageUrl: string) => {
+    setUpscaleInitialData({ imageUrl });
+    setActiveTab("upscale");
+  };
+
+  // Clear initial data after it's consumed
+  const clearGenerateInitialData = () => setGenerateInitialData(null);
+  const clearEditInitialData = () => setEditInitialData(null);
+  const clearUpscaleInitialData = () => setUpscaleInitialData(null);
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
@@ -61,25 +97,38 @@ const Index = () => {
 
             <TabsContent value="generate" className="min-h-[500px]">
               <Suspense fallback={<TabSkeleton />}>
-                <GenerateTab />
+                <GenerateTab
+                  initialData={generateInitialData}
+                  onInitialDataConsumed={clearGenerateInitialData}
+                />
               </Suspense>
             </TabsContent>
 
             <TabsContent value="edit" className="min-h-[500px]">
               <Suspense fallback={<TabSkeleton />}>
-                <EditTab />
+                <EditTab
+                  initialData={editInitialData}
+                  onInitialDataConsumed={clearEditInitialData}
+                />
               </Suspense>
             </TabsContent>
 
             <TabsContent value="upscale" className="min-h-[500px]">
               <Suspense fallback={<TabSkeleton />}>
-                <UpscaleTab />
+                <UpscaleTab
+                  initialData={upscaleInitialData}
+                  onInitialDataConsumed={clearUpscaleInitialData}
+                />
               </Suspense>
             </TabsContent>
 
             <TabsContent value="history" className="min-h-[500px]">
               <Suspense fallback={<TabSkeleton />}>
-                <HistoryTab />
+                <HistoryTab
+                  onRegenerate={handleRegenerate}
+                  onEdit={handleEditFromHistory}
+                  onUpscale={handleUpscaleFromHistory}
+                />
               </Suspense>
             </TabsContent>
           </Tabs>

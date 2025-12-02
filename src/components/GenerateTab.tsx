@@ -59,7 +59,12 @@ const PORTRAIT_RATIOS = [
   { value: "9:16", label: "9:16", description: "Tall" },
 ];
 
-export function GenerateTab() {
+interface GenerateTabProps {
+  initialData?: { prompt: string; model: string } | null;
+  onInitialDataConsumed?: () => void;
+}
+
+export function GenerateTab({ initialData, onInitialDataConsumed }: GenerateTabProps) {
   const [prompt, setPrompt] = useState("");
   const [negativePrompt, setNegativePrompt] = useState("");
   const [model, setModel] = useState("nano-banana");
@@ -76,6 +81,16 @@ export function GenerateTab() {
 
   const currentModel = MODELS.find(m => m.id === model);
   const maxImages = currentModel?.maxImages || 1;
+
+  // Handle initial data from history
+  useEffect(() => {
+    if (initialData) {
+      setPrompt(initialData.prompt);
+      setModel(initialData.model);
+      onInitialDataConsumed?.();
+      toast({ title: "Prompt loaded from history" });
+    }
+  }, [initialData, onInitialDataConsumed]);
 
   useEffect(() => {
     if (count > maxImages) {

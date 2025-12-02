@@ -19,7 +19,7 @@ import {
    DialogTitle,
 } from "@/components/ui/dialog";
 import * as VisuallyHidden from "@radix-ui/react-visually-hidden";
-import { Download, Trash2, Sparkles, Pencil, ZoomIn, Clock, X, ImageIcon } from "lucide-react";
+import { Download, Trash2, Sparkles, Pencil, ZoomIn, Clock, X, ImageIcon, RefreshCw } from "lucide-react";
 import {
    getHistory,
    deleteHistoryItem,
@@ -44,7 +44,13 @@ const typeLabels = {
    upscale: "Upscaled",
 };
 
-export function HistoryTab() {
+interface HistoryTabProps {
+   onRegenerate?: (prompt: string, model: string) => void;
+   onEdit?: (imageUrl: string) => void;
+   onUpscale?: (imageUrl: string) => void;
+}
+
+export function HistoryTab({ onRegenerate, onEdit, onUpscale }: HistoryTabProps) {
    const [history, setHistory] = useState<HistoryItem[]>([]);
    const [loading, setLoading] = useState(true);
    const [selectedItem, setSelectedItem] = useState<HistoryItem | null>(null);
@@ -297,7 +303,7 @@ export function HistoryTab() {
 
                      {/* Info panel - table-caption at bottom forces it to match table (image) width */}
                      <div
-                        className="bg-background/95 dark:bg-zinc-900 backdrop-blur-sm p-3 space-y-1 rounded-b-lg"
+                        className="bg-background/95 dark:bg-zinc-900 backdrop-blur-sm p-3 space-y-3 rounded-b-lg @container"
                         style={{ display: 'table-caption', captionSide: 'bottom' }}
                      >
                         {/* Row 1: Icon + Type label left, Model right */}
@@ -326,6 +332,53 @@ export function HistoryTab() {
                               {selectedItem.prompt}
                            </p>
                         )}
+
+                        {/* Row 3: Action buttons */}
+                        <div className="flex gap-2 pt-1">
+                           {selectedItem.type === "generate" && selectedItem.prompt && onRegenerate && (
+                              <Button
+                                 size="icon"
+                                 variant="secondary"
+                                 className="h-8 w-8"
+                                 onClick={() => {
+                                    const model = (selectedItem.params?.model as string) || "nano-banana";
+                                    onRegenerate(selectedItem.prompt!, model);
+                                    setSelectedItem(null);
+                                 }}
+                                 title="Regenerate"
+                              >
+                                 <RefreshCw className="h-4 w-4" />
+                              </Button>
+                           )}
+                           {onEdit && (
+                              <Button
+                                 size="icon"
+                                 variant="secondary"
+                                 className="h-8 w-8"
+                                 onClick={() => {
+                                    onEdit(selectedItem.imageUrl);
+                                    setSelectedItem(null);
+                                 }}
+                                 title="Edit"
+                              >
+                                 <Pencil className="h-4 w-4" />
+                              </Button>
+                           )}
+                           {onUpscale && (
+                              <Button
+                                 size="icon"
+                                 variant="secondary"
+                                 className="h-8 w-8"
+                                 onClick={() => {
+                                    onUpscale(selectedItem.imageUrl);
+                                    setSelectedItem(null);
+                                 }}
+                                 title="Upscale"
+                              >
+                                 <ZoomIn className="h-4 w-4" />
+                              </Button>
+                           )}
+                        </div>
                      </div>
                   </div>
                )}

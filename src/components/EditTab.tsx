@@ -1,4 +1,4 @@
-import { useState, useRef, useCallback } from "react";
+import { useState, useRef, useCallback, useEffect } from "react";
 import { ReactCompareSlider, ReactCompareSliderImage } from "react-compare-slider";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -17,7 +17,12 @@ import { cn } from "@/lib/utils";
 const MAX_FILE_SIZE = 16 * 1024 * 1024; // 16MB
 const ALLOWED_TYPES = ["image/jpeg", "image/png", "image/gif", "image/webp"];
 
-export function EditTab() {
+interface EditTabProps {
+  initialData?: { imageUrl: string } | null;
+  onInitialDataConsumed?: () => void;
+}
+
+export function EditTab({ initialData, onInitialDataConsumed }: EditTabProps) {
   const [prompt, setPrompt] = useState("");
   const [imageUrl, setImageUrl] = useState("");
   const [uploadedImage, setUploadedImage] = useState<string | null>(null);
@@ -28,6 +33,18 @@ export function EditTab() {
   const [showResult, setShowResult] = useState(false);
   const [isDragging, setIsDragging] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  // Handle initial data from history
+  useEffect(() => {
+    if (initialData) {
+      setImageUrl(initialData.imageUrl);
+      setImageSource("url");
+      setResult(null);
+      setShowResult(false);
+      onInitialDataConsumed?.();
+      toast({ title: "Image loaded from history" });
+    }
+  }, [initialData, onInitialDataConsumed]);
 
   const formatFileSize = (bytes: number) => {
     if (bytes < 1024) return bytes + " B";

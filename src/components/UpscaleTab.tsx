@@ -1,4 +1,4 @@
-import { useState, useRef, useCallback } from "react";
+import { useState, useRef, useCallback, useEffect } from "react";
 import { ReactCompareSlider, ReactCompareSliderImage } from "react-compare-slider";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -23,7 +23,12 @@ const UPSCALE_FACTORS = [
   { value: "x4", label: "4x", description: "4K Resolution" },
 ];
 
-export function UpscaleTab() {
+interface UpscaleTabProps {
+  initialData?: { imageUrl: string } | null;
+  onInitialDataConsumed?: () => void;
+}
+
+export function UpscaleTab({ initialData, onInitialDataConsumed }: UpscaleTabProps) {
   const [imageUrl, setImageUrl] = useState("");
   const [uploadedImage, setUploadedImage] = useState<string | null>(null);
   const [uploadedFileInfo, setUploadedFileInfo] = useState<{ name: string; size: string } | null>(null);
@@ -33,6 +38,17 @@ export function UpscaleTab() {
   const [result, setResult] = useState<ImageData | null>(null);
   const [isDragging, setIsDragging] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  // Handle initial data from history
+  useEffect(() => {
+    if (initialData) {
+      setImageUrl(initialData.imageUrl);
+      setImageSource("url");
+      setResult(null);
+      onInitialDataConsumed?.();
+      toast({ title: "Image loaded from history" });
+    }
+  }, [initialData, onInitialDataConsumed]);
 
   const formatFileSize = (bytes: number) => {
     if (bytes < 1024) return bytes + " B";
