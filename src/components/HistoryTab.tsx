@@ -256,15 +256,15 @@ export function HistoryTab() {
 
          {/* Full image preview dialog */}
          <Dialog open={!!selectedItem} onOpenChange={() => setSelectedItem(null)}>
-            <DialogContent className="max-w-[90vw] w-fit p-0 overflow-hidden border-0 bg-transparent shadow-none [&>button]:hidden">
+            <DialogContent className="max-w-[90vw] md:max-w-fit w-fit p-0 overflow-hidden border-0 bg-transparent shadow-none [&>button]:hidden">
                {selectedItem && (
-                  <div className="flex flex-col">
-                     {/* Image container */}
-                     <div className="relative rounded-t-lg overflow-hidden">
+                  <div className="flex flex-col items-center">
+                     {/* Image container - inline-block ensures it shrinks to image width */}
+                     <div className="relative rounded-t-lg overflow-hidden inline-block">
                         <img
                            src={selectedItem.imageUrl}
                            alt={selectedItem.prompt || "Image"}
-                           className="max-w-[85vw] max-h-[65vh] w-auto h-auto object-contain"
+                           className="max-w-[85vw] max-h-[65vh] w-auto h-auto block"
                         />
 
                         {/* Close button - top right */}
