@@ -3,11 +3,17 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent } from "@/components/ui/card";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Loader2, ZoomIn, Upload, Link, Download, X } from "lucide-react";
-import { upscaleImage, UPSCALE_FACTORS, type ImageData } from "@/lib/api";
+import { upscaleImage, type ImageData } from "@/lib/api";
 import { toast } from "@/hooks/use-toast";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { OptionCard } from "@/components/OptionCard";
+
+const UPSCALE_FACTORS = [
+  { value: "x2", label: "2x", description: "Double" },
+  { value: "x3", label: "3x", description: "Triple" },
+  { value: "x4", label: "4x", description: "Quadruple" },
+];
 
 export function UpscaleTab() {
   const [imageUrl, setImageUrl] = useState("");
@@ -111,6 +117,7 @@ export function UpscaleTab() {
               placeholder="https://example.com/image.png"
               value={imageUrl}
               onChange={(e) => setImageUrl(e.target.value)}
+              className="rounded-lg"
             />
           </TabsContent>
 
@@ -133,7 +140,7 @@ export function UpscaleTab() {
                 <Button
                   size="icon"
                   variant="destructive"
-                  className="absolute -right-2 -top-2 h-6 w-6"
+                  className="absolute -right-2 -top-2 h-6 w-6 rounded-lg"
                   onClick={clearUpload}
                 >
                   <X className="h-3 w-3" />
@@ -142,7 +149,7 @@ export function UpscaleTab() {
             ) : (
               <Button
                 variant="outline"
-                className="w-full border-dashed py-8"
+                className="w-full border-dashed py-8 rounded-lg"
                 onClick={() => fileInputRef.current?.click()}
               >
                 <Upload className="mr-2 h-4 w-4" />
@@ -152,24 +159,26 @@ export function UpscaleTab() {
           </TabsContent>
         </Tabs>
 
-        <div className="space-y-2">
+        <div className="space-y-3">
           <Label>Upscale Factor</Label>
-          <Select value={upscaleFactor} onValueChange={(v) => setUpscaleFactor(v as "x2" | "x3" | "x4")}>
-            <SelectTrigger>
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              {UPSCALE_FACTORS.map((f) => (
-                <SelectItem key={f.value} value={f.value}>{f.label}</SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+          <div className="grid grid-cols-3 gap-2">
+            {UPSCALE_FACTORS.map((f) => (
+              <OptionCard 
+                key={f.value} 
+                selected={upscaleFactor === f.value} 
+                onClick={() => setUpscaleFactor(f.value as "x2" | "x3" | "x4")}
+              >
+                <span className="text-sm font-bold">{f.label}</span>
+                <span className="text-xs text-muted-foreground">{f.description}</span>
+              </OptionCard>
+            ))}
+          </div>
           <p className="text-xs text-muted-foreground">
             Higher factors produce larger images but take longer
           </p>
         </div>
 
-        <Button onClick={handleUpscale} disabled={loading} className="w-full" size="lg">
+        <Button onClick={handleUpscale} disabled={loading} className="w-full rounded-lg" size="lg">
           {loading ? (
             <>
               <Loader2 className="mr-2 h-4 w-4 animate-spin" />
@@ -188,7 +197,7 @@ export function UpscaleTab() {
         <div className="grid gap-4 sm:grid-cols-2">
           <div className="space-y-2">
             <Label>Original</Label>
-            <Card className="overflow-hidden">
+            <Card className="overflow-hidden rounded-lg">
               {previewImage ? (
                 <img src={previewImage} alt="Original" className="w-full object-cover" />
               ) : (
@@ -201,7 +210,7 @@ export function UpscaleTab() {
 
           <div className="space-y-2">
             <Label>Upscaled ({upscaleFactor})</Label>
-            <Card className="group relative overflow-hidden">
+            <Card className="group relative overflow-hidden rounded-lg">
               {result ? (
                 <>
                   <img
@@ -214,6 +223,7 @@ export function UpscaleTab() {
                       size="sm"
                       variant="secondary"
                       onClick={() => handleDownload(result.url || "")}
+                      className="rounded-lg"
                     >
                       <Download className="mr-2 h-4 w-4" />
                       Download
