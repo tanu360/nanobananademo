@@ -270,7 +270,7 @@ export function HistoryTab({ onRegenerate, onEdit, onUpscale, onLoad }: HistoryT
                            <img
                               src={selectedItem.imageUrl}
                               alt={selectedItem.prompt || "Image"}
-                              className="max-w-[85vw] max-h-[50vh] sm:max-h-[70vh] w-auto h-auto block rounded-t-lg object-contain"
+                              className="max-w-[85vw] max-h-[55vh] sm:max-h-[70vh] w-auto h-auto block rounded-t-lg object-contain"
                            />
                         </div>
 
