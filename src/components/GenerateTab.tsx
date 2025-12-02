@@ -176,59 +176,59 @@ export function GenerateTab() {
             {/* Model Selection */}
             <div className="space-y-3">
               <Label>Model</Label>
-              <OptionCard 
-                selected={model === "nano-banana"} 
+              <OptionCard
+                selected={model === "nano-banana"}
                 onClick={() => setModel("nano-banana")}
                 className="w-full"
               >
                 <span className="text-sm font-medium">Nano Banana</span>
                 <span className="text-xs text-muted-foreground">Default</span>
               </OptionCard>
-              
+
               <div className="grid grid-cols-2 gap-2">
-                <OptionCard 
-                  selected={model === "imagen-4.0-ultra-generate-001"} 
+                <OptionCard
+                  selected={model === "imagen-4.0-ultra-generate-001"}
                   onClick={() => setModel("imagen-4.0-ultra-generate-001")}
                 >
                   <span className="text-sm font-medium">Imagen Ultra 4.0</span>
                   <span className="text-xs text-muted-foreground">Highest quality</span>
                 </OptionCard>
-                <OptionCard 
-                  selected={model === "imagen-4.0-generate-001"} 
+                <OptionCard
+                  selected={model === "imagen-4.0-generate-001"}
                   onClick={() => setModel("imagen-4.0-generate-001")}
                 >
                   <span className="text-sm font-medium">Imagen Pro 4.0</span>
                   <span className="text-xs text-muted-foreground">High quality</span>
                 </OptionCard>
               </div>
-              
+
               <div className="grid grid-cols-2 gap-2">
-                <OptionCard 
-                  selected={model === "imagen-4.0-fast-generate-001"} 
+                <OptionCard
+                  selected={model === "imagen-4.0-fast-generate-001"}
                   onClick={() => setModel("imagen-4.0-fast-generate-001")}
                 >
                   <span className="text-sm font-medium">Imagen Fast 4.0</span>
                   <span className="text-xs text-muted-foreground">Quick generation</span>
                 </OptionCard>
-                <OptionCard 
-                  selected={model === "imagen-3.0-generate-002"} 
+                <OptionCard
+                  selected={model === "imagen-3.0-generate-002"}
                   onClick={() => setModel("imagen-3.0-generate-002")}
                 >
                   <span className="text-sm font-medium">Imagen 3.0 v2</span>
                   <span className="text-xs text-muted-foreground">Stable</span>
                 </OptionCard>
               </div>
-              
+
               <div className="grid grid-cols-2 gap-2">
-                <OptionCard 
-                  selected={model === "imagen-3.0-generate-001"} 
+                <OptionCard
+                  selected={model === "imagen-3.0-generate-001"}
                   onClick={() => setModel("imagen-3.0-generate-001")}
                 >
                   <span className="text-sm font-medium">Imagen 3.0 v1</span>
                   <span className="text-xs text-muted-foreground">Classic</span>
                 </OptionCard>
-                <OptionCard 
-                  selected={model === "imagen-3.0-fast-generate-001"} 
+                <OptionCard
+                  selected={model === "imagen-3.0-fast-generate-001"}
                   onClick={() => setModel("imagen-3.0-fast-generate-001")}
                 >
                   <span className="text-sm font-medium">Imagen 3.0 Fast</span>
@@ -253,7 +253,7 @@ export function GenerateTab() {
             {/* Aspect Ratio */}
             <div className="space-y-3">
               <Label>Aspect Ratio</Label>
-              
+
               <div className="space-y-2">
                 <span className="text-xs uppercase tracking-wide text-muted-foreground">Landscape</span>
                 <div className="grid grid-cols-4 gap-2">
@@ -326,9 +326,9 @@ export function GenerateTab() {
               <Label>Count {maxImages === 1 && <span className="text-xs text-muted-foreground">(max 1 for {currentModel?.name})</span>}</Label>
               <div className="grid grid-cols-4 gap-2">
                 {[1, 2, 3, 4].map((n) => (
-                  <OptionCard 
-                    key={n} 
-                    selected={count === n} 
+                  <OptionCard
+                    key={n}
+                    selected={count === n}
                     onClick={() => n <= maxImages && setCount(n)}
                     className={n > maxImages ? "opacity-40 cursor-not-allowed" : ""}
                   >
@@ -403,7 +403,7 @@ export function GenerateTab() {
               alt={`Generated ${currentImageIndex + 1}`}
               className="w-full object-contain"
             />
-            
+
             {results.length > 1 && (
               <>
                 <Button
@@ -424,21 +424,9 @@ export function GenerateTab() {
                 </Button>
               </>
             )}
-            
-            <div className="absolute bottom-4 left-1/2 -translate-x-1/2">
-              <Button
-                size="sm"
-                variant="secondary"
-                className="bg-background/90 backdrop-blur-sm"
-                onClick={() => handleDownload(results[currentImageIndex].url || "", currentImageIndex)}
-              >
-                <Download className="mr-2 h-4 w-4" />
-                Download
-              </Button>
-            </div>
 
             {results.length > 1 && (
-              <div className="absolute bottom-14 left-1/2 -translate-x-1/2 flex gap-1.5">
+              <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-1.5">
                 {results.map((_, i) => (
                   <button
                     key={i}
@@ -451,6 +439,14 @@ export function GenerateTab() {
                 ))}
               </div>
             )}
+
+            <Button
+              size="icon"
+              className="absolute bottom-3 right-3 h-10 w-10 rounded-full bg-background/90 hover:bg-background text-foreground backdrop-blur-sm"
+              onClick={() => handleDownload(results[currentImageIndex].url || "", currentImageIndex)}
+            >
+              <Download className="h-4 w-4" />
+            </Button>
           </Card>
         )}
       </div>
