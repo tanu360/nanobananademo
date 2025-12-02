@@ -92,8 +92,8 @@ export function BeforeAfterSlider({
           onMouseDown={handleMouseDown}
           onTouchStart={handleMouseDown}
         >
-          <div className="h-full w-1 bg-background shadow-lg" />
-          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 flex h-10 w-10 items-center justify-center rounded-full border-2 border-background bg-primary shadow-lg">
+          <div className="h-full w-1 bg-background" />
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 flex h-10 w-10 items-center justify-center rounded-full border-2 border-background bg-primary">
             <div className="flex gap-0.5">
               <div className="h-4 w-0.5 bg-primary-foreground rounded-full" />
               <div className="h-4 w-0.5 bg-primary-foreground rounded-full" />

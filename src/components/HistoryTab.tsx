@@ -34,7 +34,7 @@ const typeIcons = {
 };
 
 // All badges use white background in light, zinc in dark
-const typeBadgeClass = "bg-white/90 dark:bg-zinc-800/90 backdrop-blur-sm shadow-lg";
+const typeBadgeClass = "bg-white/90 dark:bg-zinc-800/90 backdrop-blur-sm";
 
 const typeLabels = {
    generate: "Generated",
@@ -202,7 +202,7 @@ export function HistoryTab() {
                         style={{ animationDelay: `${index * 50}ms` }}
                         onClick={() => setSelectedItem(item)}
                      >
-                        <div className="relative overflow-hidden rounded-2xl bg-muted/20 shadow-sm hover:shadow-xl transition-all duration-300 transform hover:scale-[1.02]">
+                        <div className="relative overflow-hidden rounded-2xl bg-muted/20 hover:ring-2 hover:ring-primary/50 transition-all duration-300 transform hover:scale-[1.02]">
                            <img
                               src={item.thumbnailUrl || item.imageUrl}
                               alt={item.prompt || item.type}
@@ -226,7 +226,7 @@ export function HistoryTab() {
                               <Button
                                  size="icon"
                                  variant="ghost"
-                                 className="h-8 w-8 rounded-full bg-white/90 dark:bg-zinc-800/90 hover:bg-white dark:hover:bg-zinc-700 text-black dark:text-white shadow-lg backdrop-blur-sm"
+                                 className="h-8 w-8 rounded-full bg-white/90 dark:bg-zinc-800/90 hover:bg-white dark:hover:bg-zinc-700 text-black dark:text-white backdrop-blur-sm"
                                  onClick={(e) => handleDownload(item, e)}
                               >
                                  <Download className="h-3.5 w-3.5" />
@@ -234,7 +234,7 @@ export function HistoryTab() {
                               <Button
                                  size="icon"
                                  variant="ghost"
-                                 className="h-8 w-8 rounded-full bg-white/90 dark:bg-zinc-800/90 hover:bg-red-500 hover:text-white text-red-500 dark:text-red-400 shadow-lg backdrop-blur-sm transition-colors"
+                                 className="h-8 w-8 rounded-full bg-white/90 dark:bg-zinc-800/90 hover:bg-red-500 hover:text-white text-red-500 dark:text-red-400 backdrop-blur-sm transition-colors"
                                  onClick={(e) => handleDelete(item.id, e)}
                               >
                                  <Trash2 className="h-3.5 w-3.5" />
