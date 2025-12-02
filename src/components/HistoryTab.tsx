@@ -172,12 +172,11 @@ export function HistoryTab() {
 
          {/* Gallery Grid */}
          {loading ? (
-            <div className="columns-2 sm:columns-3 md:columns-4 lg:columns-5 gap-4 space-y-4">
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
                {[...Array(10)].map((_, i) => (
                   <div
                      key={i}
-                     className="bg-muted animate-pulse rounded-2xl break-inside-avoid"
-                     style={{ height: `${150 + Math.random() * 100}px` }}
+                     className="bg-muted animate-pulse rounded-2xl aspect-square"
                   />
                ))}
             </div>
@@ -192,7 +191,7 @@ export function HistoryTab() {
                </CardContent>
             </Card>
          ) : (
-            <div className="columns-2 sm:columns-3 md:columns-4 lg:columns-5 gap-4 space-y-4">
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
                {history.map((item, index) => {
                   const Icon = typeIcons[item.type];
                   return (
