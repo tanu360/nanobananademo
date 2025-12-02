@@ -63,7 +63,7 @@ export function Footer({ onTabChange }: FooterProps) {
                 API Documentation
               </a>
               <a
-                href="https://github.com/tanu1337"
+                href="https://github.com/tanu360"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="flex items-center gap-2 hover:text-foreground transition-colors"

@@ -1,73 +1,84 @@
-# Welcome to your Lovable project
+# NanoBanana Demo
 
-## Project info
+![NanoBanana Preview](public/og-image.webp)
 
-**URL**: https://lovable.dev/projects/fdce4ae5-dc3c-4334-9511-2eb53e2773b8
+AI Image Playground — generate, edit, and upscale images with AI.
 
-## How can I edit this code?
+## Features
 
-There are several ways of editing your application.
+### 🎨 Generate
+Create stunning images from text prompts using state-of-the-art AI models.
+- Multiple aspect ratios: 1:1, 16:9, 9:16, 4:3, 3:4, 21:9, and more
+- Resolution options: 1K, 2K, 4K
+- Quality presets: Auto, Low, Medium, High, HD
+- Batch generation: up to 4 images at once
+- Negative prompts for fine control
+- Seed support for reproducibility
+- Prompt enhancement with AI
 
-**Use Lovable**
+### ✏️ Edit
+Modify existing images using natural language instructions.
+- Upload images or provide URLs
+- AI-powered editing with text prompts
+- Before/after comparison view
+- Uses `nano-banana` model
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/fdce4ae5-dc3c-4334-9511-2eb53e2773b8) and start prompting.
+### 🔍 Upscale
+Enhance image resolution up to 4x.
+- Upscale factors: 2x, 3x, 4x
+- Supports URL or file upload
+- Uses Google's `imagen-4.0-upscale-preview`
 
-Changes made via Lovable will be committed automatically to this repo.
+## Supported Models
 
-**Use your preferred IDE**
+| Model | Provider | Type | Notes |
+|-------|----------|------|-------|
+| `nano-banana` | nano-banana-editor | Generate/Edit | Default, max 1 image |
+| `imagen-4.0-ultra-generate-001` | Google | Generate | Highest quality, max 4 |
+| `imagen-4.0-generate-001` | Google | Generate | High quality, max 4 |
+| `imagen-4.0-fast-generate-001` | Google | Generate | Fast, max 4 |
+| `imagen-3.0-generate-002` | Google | Generate | Stable, max 4 |
+| `imagen-3.0-generate-001` | Google | Generate | Classic, max 4 |
+| `imagen-3.0-fast-generate-001` | Google | Generate | Quick, max 4 |
+| `imagen-4.0-upscale-preview` | Google | Upscale | 2x/3x/4x |
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+## API
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+**Base URL:** `https://nanobanana.aikit.club`
 
-Follow these steps:
+| Endpoint | Method | Description |
+|----------|--------|-------------|
+| `/v1/images/generations` | POST | Generate images from prompt |
+| `/v1/images/edits` | POST | Edit existing images |
+| `/v1/images/upscale` | POST | Upscale image resolution |
+| `/v1/models` | GET | List available models |
 
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
+📖 **Full API Docs:** [nano-banana-api.readme.io](https://nano-banana-api.readme.io/)
 
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
+## Stack
 
-# Step 3: Install the necessary dependencies.
-npm i
+- **React 18** — UI library
+- **TypeScript** — Type safety
+- **Vite** — Build tool
+- **Tailwind CSS** — Styling
+- **shadcn/ui** — Component library
+- **TanStack Query** — Data fetching
+- **React Router** — Routing
 
-# Step 4: Start the development server with auto-reloading and an instant preview.
+## Setup
+
+```bash
+git clone https://github.com/tanu360/nanobananademo.git
+cd nanobananademo
+npm install
 npm run dev
 ```
 
-**Edit a file directly in GitHub**
+## Scripts
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
-
-**Use GitHub Codespaces**
-
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
-
-## What technologies are used for this project?
-
-This project is built with:
-
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
-
-## How can I deploy this project?
-
-Simply open [Lovable](https://lovable.dev/projects/fdce4ae5-dc3c-4334-9511-2eb53e2773b8) and click on Share -> Publish.
-
-## Can I connect a custom domain to my Lovable project?
-
-Yes, you can!
-
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
-
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/features/custom-domain#custom-domain)
+| Command | Description |
+|---------|-------------|
+| `npm run dev` | Start dev server |
+| `npm run build` | Production build |
+| `npm run lint` | Run ESLint |
+| `npm run preview` | Preview build |
