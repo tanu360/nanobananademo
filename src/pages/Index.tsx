@@ -11,9 +11,9 @@ const EditTab = lazy(() => import("@/components/EditTab").then(m => ({ default: 
 const UpscaleTab = lazy(() => import("@/components/UpscaleTab").then(m => ({ default: m.UpscaleTab })));
 const HistoryTab = lazy(() => import("@/components/HistoryTab").then(m => ({ default: m.HistoryTab })));
 
-// Loading skeleton for tabs - min-height prevents footer flicker
+// Loading skeleton for tabs
 const TabSkeleton = () => (
-  <div className="min-h-[500px] grid gap-6 lg:grid-cols-2">
+  <div className="grid gap-6 lg:grid-cols-2">
     <div className="space-y-6">
       <Skeleton className="h-[100px] w-full" />
       <Skeleton className="h-10 w-full" />
@@ -35,6 +35,7 @@ interface ImageInitialData {
 
 const Index = () => {
   const [activeTab, setActiveTab] = useState("generate");
+  const [tabLoaded, setTabLoaded] = useState<Record<string, boolean>>({ generate: false });
 
   // Initial data for tabs from history
   const [generateInitialData, setGenerateInitialData] = useState<GenerateInitialData | null>(null);
@@ -61,6 +62,14 @@ const Index = () => {
   const clearGenerateInitialData = () => setGenerateInitialData(null);
   const clearEditInitialData = () => setEditInitialData(null);
   const clearUpscaleInitialData = () => setUpscaleInitialData(null);
+
+  // Mark tab as loaded
+  const markTabLoaded = (tab: string) => {
+    setTabLoaded(prev => ({ ...prev, [tab]: true }));
+  };
+
+  // Check if current tab is loaded
+  const isCurrentTabLoaded = tabLoaded[activeTab];
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
@@ -95,39 +104,43 @@ const Index = () => {
               </TabsTrigger>
             </TabsList>
 
-            <TabsContent value="generate" className="min-h-[500px]">
+            <TabsContent value="generate">
               <Suspense fallback={<TabSkeleton />}>
                 <GenerateTab
                   initialData={generateInitialData}
                   onInitialDataConsumed={clearGenerateInitialData}
+                  onLoad={() => markTabLoaded("generate")}
                 />
               </Suspense>
             </TabsContent>
 
-            <TabsContent value="edit" className="min-h-[500px]">
+            <TabsContent value="edit">
               <Suspense fallback={<TabSkeleton />}>
                 <EditTab
                   initialData={editInitialData}
                   onInitialDataConsumed={clearEditInitialData}
+                  onLoad={() => markTabLoaded("edit")}
                 />
               </Suspense>
             </TabsContent>
 
-            <TabsContent value="upscale" className="min-h-[500px]">
+            <TabsContent value="upscale">
               <Suspense fallback={<TabSkeleton />}>
                 <UpscaleTab
                   initialData={upscaleInitialData}
                   onInitialDataConsumed={clearUpscaleInitialData}
+                  onLoad={() => markTabLoaded("upscale")}
                 />
               </Suspense>
             </TabsContent>
 
-            <TabsContent value="history" className="min-h-[500px]">
+            <TabsContent value="history">
               <Suspense fallback={<TabSkeleton />}>
                 <HistoryTab
                   onRegenerate={handleRegenerate}
                   onEdit={handleEditFromHistory}
                   onUpscale={handleUpscaleFromHistory}
+                  onLoad={() => markTabLoaded("history")}
                 />
               </Suspense>
             </TabsContent>
@@ -135,7 +148,7 @@ const Index = () => {
         </div>
       </main>
 
-      <Footer onTabChange={setActiveTab} />
+      {isCurrentTabLoaded && <Footer onTabChange={setActiveTab} />}
     </div>
   );
 };

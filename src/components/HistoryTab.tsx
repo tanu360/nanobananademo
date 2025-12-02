@@ -48,9 +48,10 @@ interface HistoryTabProps {
    onRegenerate?: (prompt: string, model: string) => void;
    onEdit?: (imageUrl: string) => void;
    onUpscale?: (imageUrl: string) => void;
+   onLoad?: () => void;
 }
 
-export function HistoryTab({ onRegenerate, onEdit, onUpscale }: HistoryTabProps) {
+export function HistoryTab({ onRegenerate, onEdit, onUpscale, onLoad }: HistoryTabProps) {
    const [history, setHistory] = useState<HistoryItem[]>([]);
    const [loading, setLoading] = useState(true);
    const [selectedItem, setSelectedItem] = useState<HistoryItem | null>(null);
@@ -65,6 +66,13 @@ export function HistoryTab({ onRegenerate, onEdit, onUpscale }: HistoryTabProps)
    useEffect(() => {
       loadHistory();
    }, []);
+
+   // Notify parent that tab is loaded
+   useEffect(() => {
+      if (!loading) {
+         onLoad?.();
+      }
+   }, [loading, onLoad]);
 
    const handleDelete = async (id: string, e: React.MouseEvent) => {
       e.stopPropagation();
@@ -276,7 +284,7 @@ export function HistoryTab({ onRegenerate, onEdit, onUpscale }: HistoryTabProps)
                            <img
                               src={selectedItem.imageUrl}
                               alt={selectedItem.prompt || "Image"}
-                              className="max-w-[85vw] max-h-[70vh] w-auto h-auto block rounded-t-lg"
+                              className="max-w-[85vw] max-h-[50vh] sm:max-h-[70vh] w-auto h-auto block rounded-t-lg object-contain"
                            />
                         </div>
 
@@ -337,9 +345,9 @@ export function HistoryTab({ onRegenerate, onEdit, onUpscale }: HistoryTabProps)
                         <div className="flex gap-2 pt-1">
                            {selectedItem.type === "generate" && selectedItem.prompt && onRegenerate && (
                               <Button
-                                 size="icon"
+                                 size="sm"
                                  variant="secondary"
-                                 className="h-8 w-8"
+                                 className="flex-1"
                                  onClick={() => {
                                     const model = (selectedItem.params?.model as string) || "nano-banana";
                                     onRegenerate(selectedItem.prompt!, model);
@@ -352,9 +360,9 @@ export function HistoryTab({ onRegenerate, onEdit, onUpscale }: HistoryTabProps)
                            )}
                            {onEdit && (
                               <Button
-                                 size="icon"
+                                 size="sm"
                                  variant="secondary"
-                                 className="h-8 w-8"
+                                 className="flex-1"
                                  onClick={() => {
                                     onEdit(selectedItem.imageUrl);
                                     setSelectedItem(null);
@@ -366,9 +374,9 @@ export function HistoryTab({ onRegenerate, onEdit, onUpscale }: HistoryTabProps)
                            )}
                            {onUpscale && (
                               <Button
-                                 size="icon"
+                                 size="sm"
                                  variant="secondary"
-                                 className="h-8 w-8"
+                                 className="flex-1"
                                  onClick={() => {
                                     onUpscale(selectedItem.imageUrl);
                                     setSelectedItem(null);

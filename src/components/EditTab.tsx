@@ -20,9 +20,10 @@ const ALLOWED_TYPES = ["image/jpeg", "image/png", "image/gif", "image/webp"];
 interface EditTabProps {
   initialData?: { imageUrl: string } | null;
   onInitialDataConsumed?: () => void;
+  onLoad?: () => void;
 }
 
-export function EditTab({ initialData, onInitialDataConsumed }: EditTabProps) {
+export function EditTab({ initialData, onInitialDataConsumed, onLoad }: EditTabProps) {
   const [prompt, setPrompt] = useState("");
   const [imageUrl, setImageUrl] = useState("");
   const [uploadedImage, setUploadedImage] = useState<string | null>(null);
@@ -33,6 +34,11 @@ export function EditTab({ initialData, onInitialDataConsumed }: EditTabProps) {
   const [showResult, setShowResult] = useState(false);
   const [isDragging, setIsDragging] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  // Notify parent that tab is loaded
+  useEffect(() => {
+    onLoad?.();
+  }, [onLoad]);
 
   // Handle initial data from history
   useEffect(() => {

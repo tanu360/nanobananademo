@@ -48,6 +48,12 @@ const SQUARE_RATIOS = [
   { value: "1:1", label: "1:1", description: "Square" },
 ];
 
+interface GenerateTabProps {
+  initialData?: { prompt: string; model: string } | null;
+  onInitialDataConsumed?: () => void;
+  onLoad?: () => void;
+}
+
 const FLEXIBLE_RATIOS = [
   { value: "5:4", label: "5:4", description: "Wide" },
   { value: "4:5", label: "4:5", description: "Tall" },
@@ -64,7 +70,7 @@ interface GenerateTabProps {
   onInitialDataConsumed?: () => void;
 }
 
-export function GenerateTab({ initialData, onInitialDataConsumed }: GenerateTabProps) {
+export function GenerateTab({ initialData, onInitialDataConsumed, onLoad }: GenerateTabProps) {
   const [prompt, setPrompt] = useState("");
   const [negativePrompt, setNegativePrompt] = useState("");
   const [model, setModel] = useState("nano-banana");
@@ -81,6 +87,11 @@ export function GenerateTab({ initialData, onInitialDataConsumed }: GenerateTabP
 
   const currentModel = MODELS.find(m => m.id === model);
   const maxImages = currentModel?.maxImages || 1;
+
+  // Notify parent that tab is loaded
+  useEffect(() => {
+    onLoad?.();
+  }, [onLoad]);
 
   // Handle initial data from history
   useEffect(() => {

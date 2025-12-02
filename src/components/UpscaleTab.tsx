@@ -26,9 +26,10 @@ const UPSCALE_FACTORS = [
 interface UpscaleTabProps {
   initialData?: { imageUrl: string } | null;
   onInitialDataConsumed?: () => void;
+  onLoad?: () => void;
 }
 
-export function UpscaleTab({ initialData, onInitialDataConsumed }: UpscaleTabProps) {
+export function UpscaleTab({ initialData, onInitialDataConsumed, onLoad }: UpscaleTabProps) {
   const [imageUrl, setImageUrl] = useState("");
   const [uploadedImage, setUploadedImage] = useState<string | null>(null);
   const [uploadedFileInfo, setUploadedFileInfo] = useState<{ name: string; size: string } | null>(null);
@@ -38,6 +39,11 @@ export function UpscaleTab({ initialData, onInitialDataConsumed }: UpscaleTabPro
   const [result, setResult] = useState<ImageData | null>(null);
   const [isDragging, setIsDragging] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  // Notify parent that tab is loaded
+  useEffect(() => {
+    onLoad?.();
+  }, [onLoad]);
 
   // Handle initial data from history
   useEffect(() => {
