@@ -7,7 +7,7 @@ interface FooterProps {
 
 export function Footer({ onTabChange }: FooterProps) {
   return (
-    <footer className="border-t py-8 mt-auto">
+    <footer className="border-t py-6 mt-auto">
       <div className="container">
         <div className="flex flex-col md:flex-row md:justify-between gap-8">
           {/* Brand - Left */}
