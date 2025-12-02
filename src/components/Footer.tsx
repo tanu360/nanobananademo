@@ -25,22 +25,22 @@ export function Footer({ onTabChange }: FooterProps) {
           <div className="space-y-3">
             <h4 className="font-medium">Features</h4>
             <nav className="flex flex-col gap-2 text-sm text-muted-foreground">
-              <button 
-                onClick={() => onTabChange?.("generate")} 
+              <button
+                onClick={() => onTabChange?.("generate")}
                 className="flex items-center gap-2 hover:text-foreground transition-colors text-left"
               >
                 <Sparkles className="h-4 w-4" />
                 Generate Images
               </button>
-              <button 
-                onClick={() => onTabChange?.("edit")} 
+              <button
+                onClick={() => onTabChange?.("edit")}
                 className="flex items-center gap-2 hover:text-foreground transition-colors text-left"
               >
                 <Pencil className="h-4 w-4" />
                 Edit Images
               </button>
-              <button 
-                onClick={() => onTabChange?.("upscale")} 
+              <button
+                onClick={() => onTabChange?.("upscale")}
                 className="flex items-center gap-2 hover:text-foreground transition-colors text-left"
               >
                 <ZoomIn className="h-4 w-4" />
@@ -53,18 +53,18 @@ export function Footer({ onTabChange }: FooterProps) {
           <div className="space-y-3">
             <h4 className="font-medium">Resources</h4>
             <nav className="flex flex-col gap-2 text-sm text-muted-foreground">
-              <a 
-                href="https://nano-banana-api.readme.io/" 
-                target="_blank" 
+              <a
+                href="https://nano-banana-api.readme.io/"
+                target="_blank"
                 rel="noopener noreferrer"
                 className="flex items-center gap-2 hover:text-foreground transition-colors"
               >
                 <ExternalLink className="h-4 w-4" />
                 API Documentation
               </a>
-              <a 
-                href="https://github.com" 
-                target="_blank" 
+              <a
+                href="https://github.com/tanu1337"
+                target="_blank"
                 rel="noopener noreferrer"
                 className="flex items-center gap-2 hover:text-foreground transition-colors"
               >
