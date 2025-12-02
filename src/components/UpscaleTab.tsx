@@ -18,11 +18,18 @@ const UPSCALE_FACTORS = [
 export function UpscaleTab() {
   const [imageUrl, setImageUrl] = useState("");
   const [uploadedImage, setUploadedImage] = useState<string | null>(null);
+  const [uploadedFileInfo, setUploadedFileInfo] = useState<{ name: string; size: string } | null>(null);
   const [imageSource, setImageSource] = useState<"url" | "upload">("url");
   const [upscaleFactor, setUpscaleFactor] = useState<"x2" | "x3" | "x4">("x2");
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<ImageData | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const formatFileSize = (bytes: number) => {
+    if (bytes < 1024) return bytes + " B";
+    if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + " KB";
+    return (bytes / (1024 * 1024)).toFixed(1) + " MB";
+  };
 
   const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -32,6 +39,8 @@ export function UpscaleTab() {
       toast({ title: "Please upload an image file", variant: "destructive" });
       return;
     }
+
+    setUploadedFileInfo({ name: file.name, size: formatFileSize(file.size) });
 
     const reader = new FileReader();
     reader.onload = (event) => {
@@ -87,6 +96,7 @@ export function UpscaleTab() {
 
   const clearUpload = () => {
     setUploadedImage(null);
+    setUploadedFileInfo(null);
     if (fileInputRef.current) {
       fileInputRef.current.value = "";
     }
@@ -131,32 +141,31 @@ export function UpscaleTab() {
               onChange={handleFileUpload}
               className="hidden"
             />
-            {uploadedImage ? (
-              <div className="relative inline-block">
-                <img
-                  src={uploadedImage}
-                  alt="Uploaded"
-                  className="max-h-40 rounded-md border object-contain"
-                />
-                <Button
-                  size="icon"
-                  variant="destructive"
-                  className="absolute -right-2 -top-2 h-6 w-6 rounded-full"
-                  onClick={clearUpload}
-                >
-                  <X className="h-3 w-3" />
-                </Button>
-              </div>
-            ) : (
-              <Button
-                variant="outline"
-                className="w-full border-dashed py-8 rounded-lg"
-                onClick={() => fileInputRef.current?.click()}
-              >
-                <Upload className="mr-2 h-4 w-4" />
-                Click to upload
-              </Button>
-            )}
+            <div
+              className="relative w-full border border-dashed rounded-lg py-8 flex flex-col items-center justify-center cursor-pointer hover:bg-muted/50 transition-colors"
+              onClick={() => !uploadedImage && fileInputRef.current?.click()}
+            >
+              {uploadedImage && uploadedFileInfo ? (
+                <>
+                  <Button
+                    size="icon"
+                    variant="destructive"
+                    className="absolute right-2 top-2 h-6 w-6 rounded-full"
+                    onClick={(e) => { e.stopPropagation(); clearUpload(); }}
+                  >
+                    <X className="h-3 w-3" />
+                  </Button>
+                  <Upload className="h-6 w-6 text-muted-foreground mb-2" />
+                  <p className="text-sm font-medium truncate max-w-[200px]">{uploadedFileInfo.name}</p>
+                  <p className="text-xs text-muted-foreground">{uploadedFileInfo.size}</p>
+                </>
+              ) : (
+                <>
+                  <Upload className="h-6 w-6 text-muted-foreground mb-2" />
+                  <p className="text-sm text-muted-foreground">Click to upload</p>
+                </>
+              )}
+            </div>
           </TabsContent>
         </Tabs>
 
