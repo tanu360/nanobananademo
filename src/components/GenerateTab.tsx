@@ -11,6 +11,7 @@ import { generateImage, type GenerateParams, type ImageData } from "@/lib/api";
 import { toast } from "@/hooks/use-toast";
 import { OptionCard, AspectRatioIcon } from "@/components/OptionCard";
 import { cn } from "@/lib/utils";
+import { preloadImages } from "@/lib/imageCache";
 
 const MODELS = [
   { id: "nano-banana", name: "Nano Banana", description: "Default", maxImages: 1 },
@@ -92,6 +93,9 @@ export function GenerateTab() {
       return;
     }
 
+    // Minimize advanced controls when generating
+    setAdvancedOpen(false);
+
     setLoading(true);
     try {
       const params: GenerateParams = {
@@ -114,6 +118,13 @@ export function GenerateTab() {
 
       const response = await generateImage(params);
       setResults(response.data);
+
+      // Preload all result images for instant viewing
+      const urls = response.data
+        .map(img => img.url)
+        .filter((url): url is string => !!url);
+      preloadImages(urls);
+
       toast({ title: "Image generated successfully!" });
     } catch (error) {
       toast({

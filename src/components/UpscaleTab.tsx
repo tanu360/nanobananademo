@@ -10,6 +10,7 @@ import { upscaleImage, type ImageData } from "@/lib/api";
 import { toast } from "@/hooks/use-toast";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { OptionCard } from "@/components/OptionCard";
+import { preloadImage } from "@/lib/imageCache";
 
 const MAX_FILE_SIZE = 16 * 1024 * 1024; // 16MB
 const ALLOWED_TYPES = ["image/jpeg", "image/png", "image/gif", "image/webp"];
@@ -75,6 +76,12 @@ export function UpscaleTab() {
         response_format: "url",
       });
       setResult(response.data[0]);
+
+      // Preload result image for instant viewing
+      if (response.data[0]?.url) {
+        preloadImage(response.data[0].url);
+      }
+
       toast({ title: "Image upscaled successfully!" });
     } catch (error) {
       toast({

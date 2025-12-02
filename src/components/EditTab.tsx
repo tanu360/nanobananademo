@@ -10,6 +10,7 @@ import { Loader2, Pencil, Upload, Link, Download, X, ImagePlus } from "lucide-re
 import { editImage, type ImageData } from "@/lib/api";
 import { toast } from "@/hooks/use-toast";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { preloadImage } from "@/lib/imageCache";
 
 const MAX_FILE_SIZE = 16 * 1024 * 1024; // 16MB
 const ALLOWED_TYPES = ["image/jpeg", "image/png", "image/gif", "image/webp"];
@@ -76,6 +77,12 @@ export function EditTab() {
       });
       setResult(response.data[0]);
       setShowResult(true);
+
+      // Preload result image for instant viewing
+      if (response.data[0]?.url) {
+        preloadImage(response.data[0].url);
+      }
+
       toast({ title: "Image edited successfully!" });
     } catch (error) {
       toast({
