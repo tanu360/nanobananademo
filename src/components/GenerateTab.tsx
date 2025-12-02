@@ -25,9 +25,8 @@ const MODELS = [
 ];
 
 const SIZES = [
-  { value: "1024x1024", label: "1K", description: "1024px" },
-  { value: "2048x2048", label: "2K", description: "2048px" },
-  { value: "4096x4096", label: "4K", description: "4096px" },
+  { value: "1K", label: "1K", description: "1024px" },
+  { value: "2K", label: "2K", description: "2048px" },
 ];
 
 const QUALITY_OPTIONS = [
@@ -64,7 +63,7 @@ export function GenerateTab() {
   const [prompt, setPrompt] = useState("");
   const [negativePrompt, setNegativePrompt] = useState("");
   const [model, setModel] = useState("nano-banana");
-  const [size, setSize] = useState("1024x1024");
+  const [size, setSize] = useState("1K");
   const [quality, setQuality] = useState("auto");
   const [aspectRatio, setAspectRatio] = useState("1:1");
   const [enhancePrompt, setEnhancePrompt] = useState(true);
@@ -102,7 +101,8 @@ export function GenerateTab() {
       const params: GenerateParams = {
         prompt,
         model,
-        size: aspectRatio !== "1:1" ? aspectRatio : size,
+        size: aspectRatio,
+        sampleImageSize: size as "1K" | "2K",
         quality,
         enhance_prompt: enhancePrompt,
         n: count,
@@ -259,7 +259,7 @@ export function GenerateTab() {
             {/* Image Size */}
             <div className="space-y-3">
               <Label>Image Size</Label>
-              <div className="grid grid-cols-3 gap-2">
+              <div className="grid grid-cols-2 gap-2">
                 {SIZES.map((s) => (
                   <OptionCard key={s.value} selected={size === s.value} onClick={() => setSize(s.value)}>
                     <span className="text-sm font-bold">{s.label}</span>

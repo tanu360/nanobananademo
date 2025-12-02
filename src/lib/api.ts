@@ -6,6 +6,7 @@ export interface GenerateParams {
   model?: string;
   n?: number;
   size?: string;
+  sampleImageSize?: "1K" | "2K";
   quality?: string;
   enhance_prompt?: boolean;
   negative_prompt?: string;

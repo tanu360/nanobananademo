@@ -11,9 +11,9 @@ const EditTab = lazy(() => import("@/components/EditTab").then(m => ({ default: 
 const UpscaleTab = lazy(() => import("@/components/UpscaleTab").then(m => ({ default: m.UpscaleTab })));
 const HistoryTab = lazy(() => import("@/components/HistoryTab").then(m => ({ default: m.HistoryTab })));
 
-// Loading skeleton for tabs
+// Loading skeleton for tabs - min-height prevents footer flicker
 const TabSkeleton = () => (
-  <div className="grid gap-6 lg:grid-cols-2">
+  <div className="min-h-[500px] grid gap-6 lg:grid-cols-2">
     <div className="space-y-6">
       <Skeleton className="h-[100px] w-full" />
       <Skeleton className="h-10 w-full" />
@@ -59,25 +59,25 @@ const Index = () => {
               </TabsTrigger>
             </TabsList>
 
-            <TabsContent value="generate">
+            <TabsContent value="generate" className="min-h-[500px]">
               <Suspense fallback={<TabSkeleton />}>
                 <GenerateTab />
               </Suspense>
             </TabsContent>
 
-            <TabsContent value="edit">
+            <TabsContent value="edit" className="min-h-[500px]">
               <Suspense fallback={<TabSkeleton />}>
                 <EditTab />
               </Suspense>
             </TabsContent>
 
-            <TabsContent value="upscale">
+            <TabsContent value="upscale" className="min-h-[500px]">
               <Suspense fallback={<TabSkeleton />}>
                 <UpscaleTab />
               </Suspense>
             </TabsContent>
 
-            <TabsContent value="history">
+            <TabsContent value="history" className="min-h-[500px]">
               <Suspense fallback={<TabSkeleton />}>
                 <HistoryTab />
               </Suspense>
