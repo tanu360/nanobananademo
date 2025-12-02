@@ -9,7 +9,7 @@ export function Header() {
     <header className="border-b bg-card/50 backdrop-blur-sm">
       <div className="container flex h-16 items-center justify-between">
         <div className="flex items-center gap-3">
-          <div className="flex h-10 w-10 items-center justify-center rounded-lg border-2 border-primary bg-transparent">
+          <div className="flex h-10 w-10 items-center justify-center rounded-md border border-border bg-transparent">
             <span className="text-xl">🍌</span>
           </div>
           <div>

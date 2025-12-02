@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -13,10 +13,13 @@ import { OptionCard, AspectRatioIcon } from "@/components/OptionCard";
 import { cn } from "@/lib/utils";
 
 const MODELS = [
-  { id: "nano-banana", name: "Nano Banana", description: "Default" },
-  { id: "imagen-4.0-ultra-generate-001", name: "Ultra 4.0", description: "Highest quality" },
-  { id: "imagen-4.0-generate-001", name: "Pro 4.0", description: "High quality" },
-  { id: "imagen-4.0-fast-generate-001", name: "Fast 4.0", description: "Quick" },
+  { id: "nano-banana", name: "Nano Banana", description: "Default", maxImages: 1 },
+  { id: "imagen-4.0-ultra-generate-001", name: "Ultra 4.0", description: "Highest quality", maxImages: 4 },
+  { id: "imagen-4.0-generate-001", name: "Pro 4.0", description: "High quality", maxImages: 4 },
+  { id: "imagen-4.0-fast-generate-001", name: "Fast 4.0", description: "Quick", maxImages: 4 },
+  { id: "imagen-3.0-generate-002", name: "Imagen 3.0 v2", description: "Stable", maxImages: 4 },
+  { id: "imagen-3.0-generate-001", name: "Imagen 3.0 v1", description: "Classic", maxImages: 4 },
+  { id: "imagen-3.0-fast-generate-001", name: "Imagen 3.0 Fast", description: "Quick", maxImages: 4 },
 ];
 
 const SIZES = [
@@ -68,6 +71,16 @@ export function GenerateTab() {
   const [loading, setLoading] = useState(false);
   const [results, setResults] = useState<ImageData[]>([]);
   const [advancedOpen, setAdvancedOpen] = useState(false);
+
+  const currentModel = MODELS.find(m => m.id === model);
+  const maxImages = currentModel?.maxImages || 1;
+
+  // Reset count if it exceeds max for selected model
+  useEffect(() => {
+    if (count > maxImages) {
+      setCount(maxImages);
+    }
+  }, [model, maxImages, count]);
 
   const handleGenerate = async () => {
     if (!prompt.trim()) {
@@ -126,6 +139,8 @@ export function GenerateTab() {
     }
   };
 
+  const availableCounts = Array.from({ length: maxImages }, (_, i) => i + 1);
+
   return (
     <div className="grid gap-6 lg:grid-cols-2">
       <div className="space-y-6">
@@ -136,7 +151,7 @@ export function GenerateTab() {
             placeholder="A serene mountain landscape at sunset with golden light reflecting off a calm lake..."
             value={prompt}
             onChange={(e) => setPrompt(e.target.value)}
-            className="min-h-[100px] resize-none rounded-lg"
+            className="min-h-[100px] resize-none"
           />
         </div>
 
@@ -247,10 +262,15 @@ export function GenerateTab() {
 
             {/* Count */}
             <div className="space-y-3">
-              <Label>Count</Label>
+              <Label>Count {maxImages === 1 && <span className="text-xs text-muted-foreground">(max 1 for {currentModel?.name})</span>}</Label>
               <div className="grid grid-cols-4 gap-2">
                 {[1, 2, 3, 4].map((n) => (
-                  <OptionCard key={n} selected={count === n} onClick={() => setCount(n)}>
+                  <OptionCard 
+                    key={n} 
+                    selected={count === n} 
+                    onClick={() => n <= maxImages && setCount(n)}
+                    className={n > maxImages ? "opacity-40 cursor-not-allowed" : ""}
+                  >
                     <span className="text-sm font-bold">{n}</span>
                   </OptionCard>
                 ))}
@@ -265,7 +285,6 @@ export function GenerateTab() {
                 placeholder="blur, low quality, distortion..."
                 value={negativePrompt}
                 onChange={(e) => setNegativePrompt(e.target.value)}
-                className="rounded-lg"
               />
             </div>
 
@@ -278,12 +297,11 @@ export function GenerateTab() {
                 placeholder="Random seed for reproducible results"
                 value={seed}
                 onChange={(e) => setSeed(e.target.value)}
-                className="rounded-lg"
               />
             </div>
 
             {/* Enhance Prompt */}
-            <div className="flex items-center justify-between rounded-lg border p-4">
+            <div className="flex items-center justify-between rounded-md border p-4">
               <div className="space-y-0.5">
                 <Label>Enhance Prompt</Label>
                 <p className="text-xs text-muted-foreground">Use AI to improve your prompt</p>
@@ -293,7 +311,7 @@ export function GenerateTab() {
           </CollapsibleContent>
         </Collapsible>
 
-        <Button onClick={handleGenerate} disabled={loading} className="w-full rounded-lg" size="lg">
+        <Button onClick={handleGenerate} disabled={loading} className="w-full" size="lg">
           {loading ? (
             <>
               <Loader2 className="mr-2 h-4 w-4 animate-spin" />
@@ -311,7 +329,7 @@ export function GenerateTab() {
       <div className="space-y-4">
         <Label>Results</Label>
         {results.length === 0 ? (
-          <Card className="flex aspect-square items-center justify-center border-dashed rounded-lg">
+          <Card className="flex aspect-square items-center justify-center border-dashed">
             <CardContent className="text-center text-muted-foreground">
               <Sparkles className="mx-auto mb-2 h-8 w-8 opacity-50" />
               <p>Generated images will appear here</p>
@@ -320,7 +338,7 @@ export function GenerateTab() {
         ) : (
           <div className="grid gap-4">
             {results.map((img, i) => (
-              <Card key={i} className="group relative overflow-hidden rounded-lg">
+              <Card key={i} className="group relative overflow-hidden">
                 <img
                   src={img.url || `data:image/png;base64,${img.b64_json}`}
                   alt={`Generated ${i + 1}`}
@@ -331,7 +349,6 @@ export function GenerateTab() {
                     size="sm"
                     variant="secondary"
                     onClick={() => handleDownload(img.url || "", i)}
-                    className="rounded-lg"
                   >
                     <Download className="mr-2 h-4 w-4" />
                     Download
