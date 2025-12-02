@@ -16,7 +16,9 @@ import {
 import {
    Dialog,
    DialogContent,
+   DialogTitle,
 } from "@/components/ui/dialog";
+import * as VisuallyHidden from "@radix-ui/react-visually-hidden";
 import { Download, Trash2, Sparkles, Pencil, ZoomIn, Clock, X, ImageIcon } from "lucide-react";
 import {
    getHistory,
@@ -256,7 +258,10 @@ export function HistoryTab() {
 
          {/* Full image preview dialog */}
          <Dialog open={!!selectedItem} onOpenChange={() => setSelectedItem(null)}>
-            <DialogContent className="max-w-fit w-fit p-0 border-0 bg-transparent shadow-none [&>button]:hidden flex items-center justify-center">
+            <DialogContent className="max-w-fit w-fit p-0 border-0 bg-transparent shadow-none [&>button]:hidden flex items-center justify-center" aria-describedby={undefined}>
+               <VisuallyHidden.Root>
+                  <DialogTitle>Image Preview</DialogTitle>
+               </VisuallyHidden.Root>
                {selectedItem && (
                   <div className="rounded-lg overflow-hidden" style={{ display: 'table', maxWidth: '85vw' }}>
                      {/* Image container */}
