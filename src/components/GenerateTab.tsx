@@ -88,10 +88,11 @@ export function GenerateTab({ initialData, onInitialDataConsumed, onLoad }: Gene
   const currentModel = MODELS.find(m => m.id === model);
   const maxImages = currentModel?.maxImages || 1;
 
-  // Notify parent that tab is loaded
+  // Notify parent that tab is loaded (only on mount)
   useEffect(() => {
     onLoad?.();
-  }, [onLoad]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   // Handle initial data from history
   useEffect(() => {

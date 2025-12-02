@@ -3,7 +3,7 @@ import { Github } from "lucide-react";
 import { useTheme } from "@/hooks/use-theme";
 
 export function Header() {
-  const { theme, setTheme, resolvedTheme } = useTheme();
+  const { theme, setTheme } = useTheme();
 
   const cycleTheme = () => {
     if (theme === "light") setTheme("dark");

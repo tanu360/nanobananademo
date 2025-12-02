@@ -3,8 +3,7 @@ import { ReactCompareSlider, ReactCompareSliderImage } from "react-compare-slide
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Card, CardContent } from "@/components/ui/card";
-import { Skeleton } from "@/components/ui/skeleton";
+import { Card } from "@/components/ui/card";
 import { Loader2, ZoomIn, Upload, Link, Download, X, ImagePlus } from "lucide-react";
 import { upscaleImage, type ImageData } from "@/lib/api";
 import { toast } from "@/hooks/use-toast";
@@ -40,10 +39,11 @@ export function UpscaleTab({ initialData, onInitialDataConsumed, onLoad }: Upsca
   const [isDragging, setIsDragging] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  // Notify parent that tab is loaded
+  // Notify parent that tab is loaded (only on mount)
   useEffect(() => {
     onLoad?.();
-  }, [onLoad]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   // Handle initial data from history
   useEffect(() => {

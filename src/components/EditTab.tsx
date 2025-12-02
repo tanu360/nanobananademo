@@ -4,8 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { Card, CardContent } from "@/components/ui/card";
-import { Skeleton } from "@/components/ui/skeleton";
+import { Card } from "@/components/ui/card";
 import { Loader2, Pencil, Upload, Link, Download, X, ImagePlus } from "lucide-react";
 import { editImage, type ImageData } from "@/lib/api";
 import { toast } from "@/hooks/use-toast";
@@ -31,14 +30,15 @@ export function EditTab({ initialData, onInitialDataConsumed, onLoad }: EditTabP
   const [imageSource, setImageSource] = useState<"url" | "upload">("url");
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<ImageData | null>(null);
-  const [showResult, setShowResult] = useState(false);
+  const [_showResult, setShowResult] = useState(false);
   const [isDragging, setIsDragging] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  // Notify parent that tab is loaded
+  // Notify parent that tab is loaded (only on mount)
   useEffect(() => {
     onLoad?.();
-  }, [onLoad]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   // Handle initial data from history
   useEffect(() => {

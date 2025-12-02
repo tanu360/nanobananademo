@@ -1,7 +1,5 @@
 // Image History using IndexedDB for large storage (~50MB+)
 
-import { type ImageData } from "./api";
-
 export interface HistoryItem {
    id: string;
    type: "generate" | "edit" | "upscale";

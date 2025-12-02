@@ -67,12 +67,13 @@ export function HistoryTab({ onRegenerate, onEdit, onUpscale, onLoad }: HistoryT
       loadHistory();
    }, []);
 
-   // Notify parent that tab is loaded
+   // Notify parent that tab is loaded (only when loading completes)
    useEffect(() => {
       if (!loading) {
          onLoad?.();
       }
-   }, [loading, onLoad]);
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+   }, [loading]);
 
    const handleDelete = async (id: string, e: React.MouseEvent) => {
       e.stopPropagation();
@@ -115,21 +116,6 @@ export function HistoryTab({ onRegenerate, onEdit, onUpscale, onLoad }: HistoryT
       if (diffHours < 24) return `${diffHours}h ago`;
       if (diffDays < 7) return `${diffDays}d ago`;
       return date.toLocaleDateString();
-   };
-
-   const formatFullDate = (timestamp: number) => {
-      const date = new Date(timestamp);
-      const day = date.getDate().toString().padStart(2, '0');
-      const month = date.toLocaleString('en-US', { month: 'long' });
-      const year = date.getFullYear();
-      const hours = date.getHours();
-      const minutes = date.getMinutes().toString().padStart(2, '0');
-      const seconds = date.getSeconds().toString().padStart(2, '0');
-      const ampm = hours >= 12 ? 'PM' : 'AM';
-      const hour12 = hours % 12 || 12;
-      const hourStr = hour12.toString().padStart(2, '0');
-
-      return `${day} ${month} ${year} ${hourStr}:${minutes}:${seconds} ${ampm}`;
    };
 
    const getModelName = (item: HistoryItem) => {
