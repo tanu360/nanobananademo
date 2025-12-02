@@ -32,7 +32,7 @@ const SIZES = [
 const QUALITY_OPTIONS = [
   { value: "auto", label: "Auto" },
   { value: "low", label: "Low" },
-  { value: "medium", label: "Medium" },
+  { value: "medium", label: "Mid" },
   { value: "high", label: "High" },
   { value: "hd", label: "HD" },
 ];

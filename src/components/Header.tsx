@@ -23,7 +23,7 @@ export function Header() {
 
         <div className="flex items-center gap-4">
           <a
-            href="https://github.com/tanu360/nanobananademo"
+            href="https://github.com/tanu360/"
             target="_blank"
             rel="noopener noreferrer"
             className="text-muted-foreground hover:text-foreground transition-colors"
