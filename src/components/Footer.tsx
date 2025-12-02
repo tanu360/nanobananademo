@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { Sparkles, Pencil, ZoomIn } from "lucide-react";
+import { Sparkles, Pencil, ZoomIn, ExternalLink, Github } from "lucide-react";
 
 interface FooterProps {
   onTabChange?: (tab: string) => void;
@@ -49,18 +49,35 @@ export function Footer({ onTabChange }: FooterProps) {
             </nav>
           </div>
 
-          {/* Links - Right */}
+          {/* Resources - Center */}
           <div className="space-y-3">
-            <h4 className="font-medium">Links</h4>
+            <h4 className="font-medium">Resources</h4>
             <nav className="flex flex-col gap-2 text-sm text-muted-foreground">
               <a 
-                href="https://nanobanana.aikit.club" 
+                href="https://nano-banana-api.readme.io/" 
                 target="_blank" 
                 rel="noopener noreferrer"
-                className="hover:text-foreground transition-colors"
+                className="flex items-center gap-2 hover:text-foreground transition-colors"
               >
+                <ExternalLink className="h-4 w-4" />
                 API Documentation
               </a>
+              <a 
+                href="https://github.com" 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="flex items-center gap-2 hover:text-foreground transition-colors"
+              >
+                <Github className="h-4 w-4" />
+                GitHub
+              </a>
+            </nav>
+          </div>
+
+          {/* Links - Right */}
+          <div className="space-y-3">
+            <h4 className="font-medium">Legal</h4>
+            <nav className="flex flex-col gap-2 text-sm text-muted-foreground">
               <Link to="/privacy" className="hover:text-foreground transition-colors">
                 Privacy Policy
               </Link>
@@ -75,7 +92,7 @@ export function Footer({ onTabChange }: FooterProps) {
           <p>
             © {new Date().getFullYear()} Nano Banana. Powered by{" "}
             <a
-              href="https://nanobanana.aikit.club"
+              href="https://nano-banana-api.readme.io/"
               className="font-medium text-foreground hover:underline"
               target="_blank"
               rel="noopener noreferrer"
