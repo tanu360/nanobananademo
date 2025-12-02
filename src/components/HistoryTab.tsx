@@ -256,22 +256,24 @@ export function HistoryTab() {
 
          {/* Full image preview dialog */}
          <Dialog open={!!selectedItem} onOpenChange={() => setSelectedItem(null)}>
-            <DialogContent className="max-w-[90vw] md:max-w-fit w-fit p-0 overflow-hidden border-0 bg-transparent shadow-none [&>button]:hidden">
+            <DialogContent className="max-w-fit w-fit p-0 border-0 bg-transparent shadow-none [&>button]:hidden flex items-center justify-center">
                {selectedItem && (
-                  <div className="flex flex-col items-center">
-                     {/* Image container - inline-block ensures it shrinks to image width */}
-                     <div className="relative rounded-t-lg overflow-hidden inline-block">
-                        <img
-                           src={selectedItem.imageUrl}
-                           alt={selectedItem.prompt || "Image"}
-                           className="max-w-[85vw] max-h-[65vh] w-auto h-auto block"
-                        />
+                  <div className="rounded-lg overflow-hidden" style={{ display: 'table', maxWidth: '85vw' }}>
+                     {/* Image container */}
+                     <div className="relative" style={{ display: 'table-row' }}>
+                        <div style={{ display: 'table-cell' }}>
+                           <img
+                              src={selectedItem.imageUrl}
+                              alt={selectedItem.prompt || "Image"}
+                              className="max-w-[85vw] max-h-[70vh] w-auto h-auto block rounded-t-lg"
+                           />
+                        </div>
 
                         {/* Close button - top right */}
                         <Button
                            size="icon"
                            variant="ghost"
-                           className="absolute top-3 right-3 h-9 w-9 rounded-full bg-white dark:bg-zinc-800 hover:bg-white dark:hover:bg-zinc-800 text-black dark:text-white backdrop-blur-sm border-0"
+                           className="absolute top-3 right-3 h-9 w-9 rounded-full bg-white dark:bg-zinc-800 hover:bg-white dark:hover:bg-zinc-800 text-black dark:text-white backdrop-blur-sm border-0 z-10"
                            onClick={() => setSelectedItem(null)}
                         >
                            <X className="h-4 w-4" />
@@ -281,18 +283,21 @@ export function HistoryTab() {
                         <Button
                            size="icon"
                            variant="ghost"
-                           className="absolute top-3 right-14 h-9 w-9 rounded-full bg-white dark:bg-zinc-800 hover:bg-white dark:hover:bg-zinc-800 text-black dark:text-white backdrop-blur-sm border-0"
+                           className="absolute top-3 right-14 h-9 w-9 rounded-full bg-white dark:bg-zinc-800 hover:bg-white dark:hover:bg-zinc-800 text-black dark:text-white backdrop-blur-sm border-0 z-10"
                            onClick={() => handleDownload(selectedItem)}
                         >
                            <Download className="h-4 w-4" />
                         </Button>
                      </div>
 
-                     {/* Info panel - below image, not overlay */}
-                     <div className="bg-background/95 dark:bg-zinc-900 backdrop-blur-sm p-4 space-y-2 rounded-b-lg">
-                        {/* Header row with type, model and date */}
-                        <div className="flex items-center justify-between flex-wrap gap-2">
-                           <div className="flex items-center gap-2">
+                     {/* Info panel - table-caption at bottom forces it to match table (image) width */}
+                     <div
+                        className="bg-background/95 dark:bg-zinc-900 backdrop-blur-sm p-3 space-y-1 rounded-b-lg"
+                        style={{ display: 'table-caption', captionSide: 'bottom' }}
+                     >
+                        {/* Row 1: Icon + Type label left, Model right */}
+                        <div className="flex items-center justify-between gap-2">
+                           <div className="flex items-center gap-2 shrink-0">
                               {(() => {
                                  const Icon = typeIcons[selectedItem.type];
                                  return (
@@ -302,20 +307,17 @@ export function HistoryTab() {
                                  );
                               })()}
                               <span className="text-sm font-medium text-foreground">{typeLabels[selectedItem.type]}</span>
-                              {getModelName(selectedItem) && (
-                                 <span className="text-xs text-muted-foreground">
-                                    • {getModelName(selectedItem)}
-                                 </span>
-                              )}
                            </div>
-                           <span className="text-xs text-muted-foreground">
-                              {formatFullDate(selectedItem.timestamp)}
-                           </span>
+                           {getModelName(selectedItem) && (
+                              <span className="text-xs text-muted-foreground text-right">
+                                 {getModelName(selectedItem)}
+                              </span>
+                           )}
                         </div>
 
-                        {/* Prompt with word wrap */}
+                        {/* Row 2: Prompt - scrollable but scrollbar hidden */}
                         {selectedItem.prompt && (
-                           <p className="text-sm text-foreground/90 break-words whitespace-pre-wrap max-h-24 overflow-y-auto">
+                           <p className="text-sm text-foreground/90 break-words max-h-20 overflow-y-auto scrollbar-none" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
                               {selectedItem.prompt}
                            </p>
                         )}
