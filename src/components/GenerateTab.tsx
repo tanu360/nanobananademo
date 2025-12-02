@@ -126,10 +126,12 @@ export function GenerateTab() {
         .filter((url): url is string => !!url);
       preloadImages(urls);
 
-      // Save all generated images to history
+      // Save all generated images to history with revised_prompt
       for (const img of response.data) {
         if (img.url) {
-          saveToHistory("generate", img.url, prompt, { model, size, quality, aspectRatio });
+          // Use revised_prompt from API response, fallback to user prompt
+          const displayPrompt = img.revised_prompt || prompt;
+          saveToHistory("generate", img.url, displayPrompt, { model, size, quality, aspectRatio });
         }
       }
 
