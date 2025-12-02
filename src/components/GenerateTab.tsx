@@ -12,6 +12,7 @@ import { toast } from "@/hooks/use-toast";
 import { OptionCard, AspectRatioIcon } from "@/components/OptionCard";
 import { cn } from "@/lib/utils";
 import { preloadImages } from "@/lib/imageCache";
+import { saveToHistory } from "@/lib/imageHistory";
 
 const MODELS = [
   { id: "nano-banana", name: "Nano Banana", description: "Default", maxImages: 1 },
@@ -124,6 +125,13 @@ export function GenerateTab() {
         .map(img => img.url)
         .filter((url): url is string => !!url);
       preloadImages(urls);
+
+      // Save all generated images to history
+      for (const img of response.data) {
+        if (img.url) {
+          saveToHistory("generate", img.url, prompt, { model, size, quality, aspectRatio });
+        }
+      }
 
       toast({ title: "Image generated successfully!" });
     } catch (error) {

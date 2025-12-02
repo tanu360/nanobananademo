@@ -1,0 +1,316 @@
+import { useState, useEffect } from "react";
+import { Card, CardContent } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Label } from "@/components/ui/label";
+import {
+   AlertDialog,
+   AlertDialogAction,
+   AlertDialogCancel,
+   AlertDialogContent,
+   AlertDialogDescription,
+   AlertDialogFooter,
+   AlertDialogHeader,
+   AlertDialogTitle,
+   AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
+import {
+   Dialog,
+   DialogContent,
+} from "@/components/ui/dialog";
+import { Download, Trash2, Sparkles, Pencil, ZoomIn, Clock, X } from "lucide-react";
+import {
+   getHistory,
+   deleteHistoryItem,
+   clearHistory,
+   type HistoryItem,
+} from "@/lib/imageHistory";
+import { toast } from "@/hooks/use-toast";
+import { cn } from "@/lib/utils";
+
+const typeIcons = {
+   generate: Sparkles,
+   edit: Pencil,
+   upscale: ZoomIn,
+};
+
+// All badges use white background in light, zinc in dark
+const typeBadgeClass = "bg-white dark:bg-zinc-800 backdrop-blur-sm";
+
+const typeLabels = {
+   generate: "Generated",
+   edit: "Edited",
+   upscale: "Upscaled",
+};
+
+export function HistoryTab() {
+   const [history, setHistory] = useState<HistoryItem[]>([]);
+   const [loading, setLoading] = useState(true);
+   const [selectedItem, setSelectedItem] = useState<HistoryItem | null>(null);
+
+   const loadHistory = async () => {
+      setLoading(true);
+      const items = await getHistory();
+      setHistory(items);
+      setLoading(false);
+   };
+
+   useEffect(() => {
+      loadHistory();
+   }, []);
+
+   const handleDelete = async (id: string, e: React.MouseEvent) => {
+      e.stopPropagation();
+      await deleteHistoryItem(id);
+      setHistory((prev) => prev.filter((item) => item.id !== id));
+      toast({ title: "Image deleted from history" });
+   };
+
+   const handleClearAll = async () => {
+      await clearHistory();
+      setHistory([]);
+      toast({ title: "History cleared" });
+   };
+
+   const handleDownload = async (item: HistoryItem, e?: React.MouseEvent) => {
+      e?.stopPropagation();
+      try {
+         const a = document.createElement("a");
+         a.href = item.imageUrl;
+         a.download = `nanobanana-${item.type}-${Date.now()}.png`;
+         document.body.appendChild(a);
+         a.click();
+         document.body.removeChild(a);
+         toast({ title: "Download started" });
+      } catch {
+         toast({ title: "Download failed", variant: "destructive" });
+      }
+   };
+
+   const formatRelativeTime = (timestamp: number) => {
+      const date = new Date(timestamp);
+      const now = new Date();
+      const diffMs = now.getTime() - date.getTime();
+      const diffMins = Math.floor(diffMs / 60000);
+      const diffHours = Math.floor(diffMs / 3600000);
+      const diffDays = Math.floor(diffMs / 86400000);
+
+      if (diffMins < 1) return "Just now";
+      if (diffMins < 60) return `${diffMins}m ago`;
+      if (diffHours < 24) return `${diffHours}h ago`;
+      if (diffDays < 7) return `${diffDays}d ago`;
+      return date.toLocaleDateString();
+   };
+
+   const formatFullDate = (timestamp: number) => {
+      const date = new Date(timestamp);
+      const day = date.getDate().toString().padStart(2, '0');
+      const month = date.toLocaleString('en-US', { month: 'long' });
+      const year = date.getFullYear();
+      const hours = date.getHours();
+      const minutes = date.getMinutes().toString().padStart(2, '0');
+      const seconds = date.getSeconds().toString().padStart(2, '0');
+      const ampm = hours >= 12 ? 'PM' : 'AM';
+      const hour12 = hours % 12 || 12;
+      const hourStr = hour12.toString().padStart(2, '0');
+
+      return `${day} ${month} ${year} ${hourStr}:${minutes}:${seconds} ${ampm}`;
+   };
+
+   const getModelName = (item: HistoryItem) => {
+      if (item.params?.model) {
+         const model = item.params.model as string;
+         if (model === "nano-banana") return "Nano Banana";
+         if (model === "nano-banana-editor") return "Nano Banana Editor";
+         if (model === "nano-banana-upscaler") return "Nano Banana Upscaler";
+         if (model.includes("ultra")) return "Imagen Ultra 4.0";
+         if (model.includes("4.0-generate")) return "Imagen Pro 4.0";
+         if (model.includes("4.0-fast")) return "Imagen Fast 4.0";
+         if (model.includes("3.0-generate-002")) return "Imagen 3.0 v2";
+         if (model.includes("3.0-generate-001")) return "Imagen 3.0 v1";
+         if (model.includes("3.0-fast")) return "Imagen 3.0 Fast";
+         return model;
+      }
+      return null;
+   };
+
+   return (
+      <div className="space-y-6">
+         {/* Header with count and clear button */}
+         <div className="flex items-center justify-between">
+            <Label className="flex items-center gap-2">
+               History
+               <span className="text-muted-foreground">({history.length})</span>
+               {history.length > 0 && (
+                  <AlertDialog>
+                     <AlertDialogTrigger asChild>
+                        <Button
+                           size="icon"
+                           variant="ghost"
+                           className="h-8 w-8 rounded-full text-muted-foreground hover:text-red-400 hover:bg-red-400/10"
+                        >
+                           <Trash2 className="h-4 w-4" />
+                        </Button>
+                     </AlertDialogTrigger>
+                     <AlertDialogContent>
+                        <AlertDialogHeader>
+                           <AlertDialogTitle>Clear all history?</AlertDialogTitle>
+                           <AlertDialogDescription>
+                              This will permanently delete all {history.length} images from your history. This action cannot be undone.
+                           </AlertDialogDescription>
+                        </AlertDialogHeader>
+                        <AlertDialogFooter>
+                           <AlertDialogCancel>Cancel</AlertDialogCancel>
+                           <AlertDialogAction onClick={handleClearAll}>
+                              Clear All
+                           </AlertDialogAction>
+                        </AlertDialogFooter>
+                     </AlertDialogContent>
+                  </AlertDialog>
+               )}
+            </Label>
+         </div>
+
+         {/* Gallery Grid */}
+         {loading ? (
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3">
+               {[...Array(10)].map((_, i) => (
+                  <div key={i} className="aspect-square bg-muted animate-pulse rounded-lg" />
+               ))}
+            </div>
+         ) : history.length === 0 ? (
+            <Card className="flex min-h-[300px] items-center justify-center border-dashed">
+               <CardContent className="text-center text-muted-foreground">
+                  <Clock className="mx-auto mb-2 h-8 w-8 opacity-50" />
+                  <p className="font-medium">No history yet</p>
+                  <p className="text-sm">Generated images will appear here</p>
+               </CardContent>
+            </Card>
+         ) : (
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3">
+               {history.map((item) => {
+                  const Icon = typeIcons[item.type];
+                  const modelName = getModelName(item);
+                  return (
+                     <Card
+                        key={item.id}
+                        className="group relative aspect-square overflow-hidden cursor-pointer hover:ring-2 hover:ring-primary transition-all"
+                        onClick={() => setSelectedItem(item)}
+                     >
+                        <img
+                           src={item.thumbnailUrl || item.imageUrl}
+                           alt={item.prompt || item.type}
+                           className="w-full h-full object-cover"
+                           loading="lazy"
+                        />
+
+                        {/* Type badge */}
+                        <div className={cn(
+                           "absolute top-2 left-2 p-1.5 rounded-full",
+                           typeBadgeClass
+                        )}>
+                           <Icon className="h-3 w-3 text-black dark:text-white" />
+                        </div>
+
+                        {/* Hover overlay */}
+                        <div className="absolute inset-0 bg-black/70 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col justify-between p-2">
+                           <div className="flex justify-end gap-1">
+                              <Button
+                                 size="icon"
+                                 variant="ghost"
+                                 className="h-8 w-8 rounded-full bg-white dark:bg-zinc-800 hover:bg-white dark:hover:bg-zinc-800 text-black dark:text-white backdrop-blur-sm"
+                                 onClick={(e) => handleDownload(item, e)}
+                              >
+                                 <Download className="h-4 w-4" />
+                              </Button>
+                              <Button
+                                 size="icon"
+                                 variant="ghost"
+                                 className="h-8 w-8 rounded-full bg-white dark:bg-zinc-800 hover:bg-white dark:hover:bg-zinc-800 text-red-500 backdrop-blur-sm"
+                                 onClick={(e) => handleDelete(item.id, e)}
+                              >
+                                 <Trash2 className="h-4 w-4" />
+                              </Button>
+                           </div>
+                           <div className="text-white text-xs">
+                              <p className="opacity-70">{formatRelativeTime(item.timestamp)}</p>
+                           </div>
+                        </div>
+                     </Card>
+                  );
+               })}
+            </div>
+         )}
+
+         {/* Full image preview dialog */}
+         <Dialog open={!!selectedItem} onOpenChange={() => setSelectedItem(null)}>
+            <DialogContent className="max-w-[90vw] w-fit p-0 overflow-hidden border-0 bg-transparent shadow-none [&>button]:hidden">
+               {selectedItem && (
+                  <div className="flex flex-col">
+                     {/* Image container */}
+                     <div className="relative rounded-t-lg overflow-hidden">
+                        <img
+                           src={selectedItem.imageUrl}
+                           alt={selectedItem.prompt || "Image"}
+                           className="max-w-[85vw] max-h-[65vh] w-auto h-auto object-contain"
+                        />
+
+                        {/* Close button - top right */}
+                        <Button
+                           size="icon"
+                           variant="ghost"
+                           className="absolute top-3 right-3 h-9 w-9 rounded-full bg-white dark:bg-zinc-800 hover:bg-white dark:hover:bg-zinc-800 text-black dark:text-white backdrop-blur-sm border-0"
+                           onClick={() => setSelectedItem(null)}
+                        >
+                           <X className="h-4 w-4" />
+                        </Button>
+
+                        {/* Download button - top right next to close */}
+                        <Button
+                           size="icon"
+                           variant="ghost"
+                           className="absolute top-3 right-14 h-9 w-9 rounded-full bg-white dark:bg-zinc-800 hover:bg-white dark:hover:bg-zinc-800 text-black dark:text-white backdrop-blur-sm border-0"
+                           onClick={() => handleDownload(selectedItem)}
+                        >
+                           <Download className="h-4 w-4" />
+                        </Button>
+                     </div>
+
+                     {/* Info panel - below image, not overlay */}
+                     <div className="bg-background/95 dark:bg-zinc-900 backdrop-blur-sm p-4 space-y-2 rounded-b-lg">
+                        {/* Header row with type, model and date */}
+                        <div className="flex items-center justify-between flex-wrap gap-2">
+                           <div className="flex items-center gap-2">
+                              {(() => {
+                                 const Icon = typeIcons[selectedItem.type];
+                                 return (
+                                    <span className="p-1.5 rounded-full bg-foreground/10">
+                                       <Icon className="h-3.5 w-3.5 text-foreground" />
+                                    </span>
+                                 );
+                              })()}
+                              <span className="text-sm font-medium text-foreground">{typeLabels[selectedItem.type]}</span>
+                              {getModelName(selectedItem) && (
+                                 <span className="text-xs text-muted-foreground">
+                                    • {getModelName(selectedItem)}
+                                 </span>
+                              )}
+                           </div>
+                           <span className="text-xs text-muted-foreground">
+                              {formatFullDate(selectedItem.timestamp)}
+                           </span>
+                        </div>
+
+                        {/* Prompt with word wrap */}
+                        {selectedItem.prompt && (
+                           <p className="text-sm text-foreground/90 break-words whitespace-pre-wrap max-h-24 overflow-y-auto">
+                              {selectedItem.prompt}
+                           </p>
+                        )}
+                     </div>
+                  </div>
+               )}
+            </DialogContent>
+         </Dialog>
+      </div>
+   );
+}

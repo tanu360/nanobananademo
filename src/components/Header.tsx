@@ -14,7 +14,7 @@ export function Header() {
   const ThemeIcon = theme === "light" ? Sun : theme === "dark" ? Moon : Monitor;
 
   return (
-    <header className="border-b bg-card/80 backdrop-blur-md z-50">
+    <header>
       <div className="container flex h-12 items-center justify-between">
         <div className="flex items-center gap-3">
           <span className="text-2xl hover:rotate-12 transition-transform duration-300 cursor-default">🍌</span>

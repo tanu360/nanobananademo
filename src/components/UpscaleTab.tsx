@@ -1,4 +1,4 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useCallback } from "react";
 import { ReactCompareSlider, ReactCompareSliderImage } from "react-compare-slider";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -11,6 +11,8 @@ import { toast } from "@/hooks/use-toast";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { OptionCard } from "@/components/OptionCard";
 import { preloadImage } from "@/lib/imageCache";
+import { saveToHistory } from "@/lib/imageHistory";
+import { cn } from "@/lib/utils";
 
 const MAX_FILE_SIZE = 16 * 1024 * 1024; // 16MB
 const ALLOWED_TYPES = ["image/jpeg", "image/png", "image/gif", "image/webp"];
@@ -29,6 +31,7 @@ export function UpscaleTab() {
   const [upscaleFactor, setUpscaleFactor] = useState<"x2" | "x3" | "x4">("x2");
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<ImageData | null>(null);
+  const [isDragging, setIsDragging] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const formatFileSize = (bytes: number) => {
@@ -80,6 +83,8 @@ export function UpscaleTab() {
       // Preload result image for instant viewing
       if (response.data[0]?.url) {
         preloadImage(response.data[0].url);
+        // Save to history with model name
+        saveToHistory("upscale", response.data[0].url, undefined, { model: "nano-banana-upscaler", upscaleFactor });
       }
 
       toast({ title: "Image upscaled successfully!" });
@@ -118,6 +123,47 @@ export function UpscaleTab() {
       fileInputRef.current.value = "";
     }
   };
+
+  // Drag and drop handlers
+  const handleDragOver = useCallback((e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragging(true);
+  }, []);
+
+  const handleDragLeave = useCallback((e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragging(false);
+  }, []);
+
+  const handleDrop = useCallback((e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragging(false);
+
+    const file = e.dataTransfer.files?.[0];
+    if (!file) return;
+
+    if (!ALLOWED_TYPES.includes(file.type)) {
+      toast({ title: "Only JPG, PNG, GIF, WebP formats are supported", variant: "destructive" });
+      return;
+    }
+
+    if (file.size > MAX_FILE_SIZE) {
+      toast({ title: "File size must be less than 16MB", variant: "destructive" });
+      return;
+    }
+
+    setUploadedFileInfo({ name: file.name, size: formatFileSize(file.size) });
+
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      setUploadedImage(event.target?.result as string);
+      setImageSource("upload");
+    };
+    reader.readAsDataURL(file);
+  }, []);
 
   const previewImage = imageSource === "url" ? imageUrl : uploadedImage;
   const resultImage = result?.url || (result?.b64_json ? `data:image/png;base64,${result.b64_json}` : null);
@@ -159,8 +205,14 @@ export function UpscaleTab() {
               className="hidden"
             />
             <div
-              className="relative w-full border border-dashed rounded-lg py-4 flex flex-col items-center justify-center cursor-pointer hover:bg-muted/50 transition-colors"
+              className={cn(
+                "relative w-full border-2 border-dashed rounded-lg py-4 flex flex-col items-center justify-center cursor-pointer transition-colors",
+                isDragging ? "border-primary bg-primary/10" : "border-border hover:bg-muted/50"
+              )}
               onClick={() => !uploadedImage && fileInputRef.current?.click()}
+              onDragOver={handleDragOver}
+              onDragLeave={handleDragLeave}
+              onDrop={handleDrop}
             >
               {uploadedImage && uploadedFileInfo ? (
                 <>
@@ -178,8 +230,10 @@ export function UpscaleTab() {
                 </>
               ) : (
                 <>
-                  <Upload className="h-5 w-5 text-muted-foreground mb-1" />
-                  <p className="text-xs text-muted-foreground">Click to upload (max 16MB)</p>
+                  <Upload className={cn("h-5 w-5 mb-1", isDragging ? "text-primary" : "text-muted-foreground")} />
+                  <p className={cn("text-xs", isDragging ? "text-primary" : "text-muted-foreground")}>
+                    {isDragging ? "Drop image here" : "Click or drag & drop (max 16MB)"}
+                  </p>
                 </>
               )}
             </div>
