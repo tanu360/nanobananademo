@@ -413,7 +413,11 @@ export function GenerateTab() {
         {results.length === 0 ? (
           <Card className="flex min-h-[300px] items-center justify-center border-dashed">
             <CardContent className="text-center text-muted-foreground">
-              <Sparkles className="mx-auto mb-2 h-8 w-8 opacity-50" />
+              {loading ? (
+                <Loader2 className="mx-auto mb-2 h-8 w-8 animate-spin" />
+              ) : (
+                <Sparkles className="mx-auto mb-2 h-8 w-8 opacity-50" />
+              )}
               <p>Generated images will appear here</p>
             </CardContent>
           </Card>
