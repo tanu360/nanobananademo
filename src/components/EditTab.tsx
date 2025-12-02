@@ -184,37 +184,37 @@ export function EditTab() {
         </Button>
       </div>
 
-      <div className="space-y-4">
-        <div className="grid gap-4 sm:grid-cols-2">
-          <div className="space-y-2">
+      <div className="flex flex-col">
+        <div className="grid h-full gap-4 sm:grid-cols-2">
+          <div className="flex flex-col space-y-2">
             <Label>Original</Label>
-            <Card className="overflow-hidden rounded-lg">
+            <Card className="flex-1 overflow-hidden rounded-md">
               {previewImage ? (
-                <img src={previewImage} alt="Original" className="w-full object-cover" />
+                <img src={previewImage} alt="Original" className="h-full w-full object-cover" />
               ) : (
-                <CardContent className="flex aspect-square items-center justify-center text-muted-foreground">
+                <CardContent className="flex h-full min-h-[300px] items-center justify-center text-muted-foreground">
                   <p className="text-sm">No image selected</p>
                 </CardContent>
               )}
             </Card>
           </div>
 
-          <div className="space-y-2">
+          <div className="flex flex-col space-y-2">
             <Label>Result</Label>
-            <Card className="group relative overflow-hidden rounded-lg">
+            <Card className="group relative flex-1 overflow-hidden rounded-md">
               {result ? (
                 <>
                   <img
                     src={result.url || `data:image/png;base64,${result.b64_json}`}
                     alt="Edited"
-                    className="w-full object-cover"
+                    className="h-full w-full object-cover"
                   />
                   <div className="absolute inset-0 flex items-center justify-center bg-foreground/60 opacity-0 transition-opacity group-hover:opacity-100">
                     <Button
                       size="sm"
                       variant="secondary"
                       onClick={() => handleDownload(result.url || "")}
-                      className="rounded-lg"
+                      className="rounded-md"
                     >
                       <Download className="mr-2 h-4 w-4" />
                       Download
@@ -222,7 +222,7 @@ export function EditTab() {
                   </div>
                 </>
               ) : (
-                <CardContent className="flex aspect-square items-center justify-center text-muted-foreground">
+                <CardContent className="flex h-full min-h-[300px] items-center justify-center text-muted-foreground">
                   <p className="text-sm">Result will appear here</p>
                 </CardContent>
               )}

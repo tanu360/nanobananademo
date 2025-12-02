@@ -6,7 +6,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
 import { Card, CardContent } from "@/components/ui/card";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
-import { Loader2, Sparkles, Download, ChevronDown } from "lucide-react";
+import { Loader2, Sparkles, Download, ChevronDown, ChevronLeft, ChevronRight } from "lucide-react";
 import { generateImage, type GenerateParams, type ImageData } from "@/lib/api";
 import { toast } from "@/hooks/use-toast";
 import { OptionCard, AspectRatioIcon } from "@/components/OptionCard";
@@ -14,9 +14,9 @@ import { cn } from "@/lib/utils";
 
 const MODELS = [
   { id: "nano-banana", name: "Nano Banana", description: "Default", maxImages: 1 },
-  { id: "imagen-4.0-ultra-generate-001", name: "Ultra 4.0", description: "Highest quality", maxImages: 4 },
-  { id: "imagen-4.0-generate-001", name: "Pro 4.0", description: "High quality", maxImages: 4 },
-  { id: "imagen-4.0-fast-generate-001", name: "Fast 4.0", description: "Quick", maxImages: 4 },
+  { id: "imagen-4.0-ultra-generate-001", name: "Imagen Ultra 4.0", description: "Highest quality", maxImages: 4 },
+  { id: "imagen-4.0-generate-001", name: "Imagen Pro 4.0", description: "High quality", maxImages: 4 },
+  { id: "imagen-4.0-fast-generate-001", name: "Imagen Fast 4.0", description: "Quick generation", maxImages: 4 },
   { id: "imagen-3.0-generate-002", name: "Imagen 3.0 v2", description: "Stable", maxImages: 4 },
   { id: "imagen-3.0-generate-001", name: "Imagen 3.0 v1", description: "Classic", maxImages: 4 },
   { id: "imagen-3.0-fast-generate-001", name: "Imagen 3.0 Fast", description: "Quick", maxImages: 4 },
@@ -71,16 +71,20 @@ export function GenerateTab() {
   const [loading, setLoading] = useState(false);
   const [results, setResults] = useState<ImageData[]>([]);
   const [advancedOpen, setAdvancedOpen] = useState(false);
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
 
   const currentModel = MODELS.find(m => m.id === model);
   const maxImages = currentModel?.maxImages || 1;
 
-  // Reset count if it exceeds max for selected model
   useEffect(() => {
     if (count > maxImages) {
       setCount(maxImages);
     }
   }, [model, maxImages, count]);
+
+  useEffect(() => {
+    setCurrentImageIndex(0);
+  }, [results]);
 
   const handleGenerate = async () => {
     if (!prompt.trim()) {
@@ -139,7 +143,13 @@ export function GenerateTab() {
     }
   };
 
-  const availableCounts = Array.from({ length: maxImages }, (_, i) => i + 1);
+  const goToPrevImage = () => {
+    setCurrentImageIndex((prev) => (prev === 0 ? results.length - 1 : prev - 1));
+  };
+
+  const goToNextImage = () => {
+    setCurrentImageIndex((prev) => (prev === results.length - 1 ? 0 : prev + 1));
+  };
 
   return (
     <div className="grid gap-6 lg:grid-cols-2">
@@ -166,13 +176,64 @@ export function GenerateTab() {
             {/* Model Selection */}
             <div className="space-y-3">
               <Label>Model</Label>
+              <OptionCard 
+                selected={model === "nano-banana"} 
+                onClick={() => setModel("nano-banana")}
+                className="w-full"
+              >
+                <span className="text-sm font-medium">Nano Banana</span>
+                <span className="text-xs text-muted-foreground">Default</span>
+              </OptionCard>
+              
               <div className="grid grid-cols-2 gap-2">
-                {MODELS.map((m) => (
-                  <OptionCard key={m.id} selected={model === m.id} onClick={() => setModel(m.id)}>
-                    <span className="text-sm font-medium">{m.name}</span>
-                    <span className="text-xs text-muted-foreground">{m.description}</span>
-                  </OptionCard>
-                ))}
+                <OptionCard 
+                  selected={model === "imagen-4.0-ultra-generate-001"} 
+                  onClick={() => setModel("imagen-4.0-ultra-generate-001")}
+                >
+                  <span className="text-sm font-medium">Imagen Ultra 4.0</span>
+                  <span className="text-xs text-muted-foreground">Highest quality</span>
+                </OptionCard>
+                <OptionCard 
+                  selected={model === "imagen-4.0-generate-001"} 
+                  onClick={() => setModel("imagen-4.0-generate-001")}
+                >
+                  <span className="text-sm font-medium">Imagen Pro 4.0</span>
+                  <span className="text-xs text-muted-foreground">High quality</span>
+                </OptionCard>
+              </div>
+              
+              <div className="grid grid-cols-2 gap-2">
+                <OptionCard 
+                  selected={model === "imagen-4.0-fast-generate-001"} 
+                  onClick={() => setModel("imagen-4.0-fast-generate-001")}
+                >
+                  <span className="text-sm font-medium">Imagen Fast 4.0</span>
+                  <span className="text-xs text-muted-foreground">Quick generation</span>
+                </OptionCard>
+                <OptionCard 
+                  selected={model === "imagen-3.0-generate-002"} 
+                  onClick={() => setModel("imagen-3.0-generate-002")}
+                >
+                  <span className="text-sm font-medium">Imagen 3.0 v2</span>
+                  <span className="text-xs text-muted-foreground">Stable</span>
+                </OptionCard>
+              </div>
+              
+              <div className="grid grid-cols-2 gap-2">
+                <OptionCard 
+                  selected={model === "imagen-3.0-generate-001"} 
+                  onClick={() => setModel("imagen-3.0-generate-001")}
+                >
+                  <span className="text-sm font-medium">Imagen 3.0 v1</span>
+                  <span className="text-xs text-muted-foreground">Classic</span>
+                </OptionCard>
+                <OptionCard 
+                  selected={model === "imagen-3.0-fast-generate-001"} 
+                  onClick={() => setModel("imagen-3.0-fast-generate-001")}
+                >
+                  <span className="text-sm font-medium">Imagen 3.0 Fast</span>
+                  <span className="text-xs text-muted-foreground">Quick</span>
+                </OptionCard>
               </div>
             </div>
 
@@ -326,42 +387,76 @@ export function GenerateTab() {
         </Button>
       </div>
 
-      <div className="space-y-4">
-        <Label>Results</Label>
+      <div className="flex flex-col space-y-4">
+        <Label>Results {results.length > 1 && `(${currentImageIndex + 1}/${results.length})`}</Label>
         {results.length === 0 ? (
-          <Card className="flex aspect-square items-center justify-center border-dashed">
+          <Card className="flex flex-1 min-h-[300px] items-center justify-center border-dashed">
             <CardContent className="text-center text-muted-foreground">
               <Sparkles className="mx-auto mb-2 h-8 w-8 opacity-50" />
               <p>Generated images will appear here</p>
             </CardContent>
           </Card>
         ) : (
-          <div className="grid gap-4">
-            {results.map((img, i) => (
-              <Card key={i} className="group relative overflow-hidden">
-                <img
-                  src={img.url || `data:image/png;base64,${img.b64_json}`}
-                  alt={`Generated ${i + 1}`}
-                  className="w-full object-cover"
-                />
-                <div className="absolute inset-0 flex items-center justify-center bg-foreground/60 opacity-0 transition-opacity group-hover:opacity-100">
-                  <Button
-                    size="sm"
-                    variant="secondary"
-                    onClick={() => handleDownload(img.url || "", i)}
-                  >
-                    <Download className="mr-2 h-4 w-4" />
-                    Download
-                  </Button>
-                </div>
-                {img.revised_prompt && (
-                  <CardContent className="p-3">
-                    <p className="text-xs text-muted-foreground line-clamp-2">{img.revised_prompt}</p>
-                  </CardContent>
-                )}
-              </Card>
-            ))}
-          </div>
+          <Card className="group relative flex-1 min-h-[300px] overflow-hidden">
+            <img
+              src={results[currentImageIndex].url || `data:image/png;base64,${results[currentImageIndex].b64_json}`}
+              alt={`Generated ${currentImageIndex + 1}`}
+              className="h-full w-full object-contain"
+            />
+            
+            {results.length > 1 && (
+              <>
+                <Button
+                  size="icon"
+                  variant="secondary"
+                  className="absolute left-2 top-1/2 -translate-y-1/2 h-8 w-8 rounded-md opacity-0 transition-opacity group-hover:opacity-100"
+                  onClick={goToPrevImage}
+                >
+                  <ChevronLeft className="h-4 w-4" />
+                </Button>
+                <Button
+                  size="icon"
+                  variant="secondary"
+                  className="absolute right-2 top-1/2 -translate-y-1/2 h-8 w-8 rounded-md opacity-0 transition-opacity group-hover:opacity-100"
+                  onClick={goToNextImage}
+                >
+                  <ChevronRight className="h-4 w-4" />
+                </Button>
+              </>
+            )}
+            
+            <div className="absolute bottom-4 left-1/2 -translate-x-1/2 opacity-0 transition-opacity group-hover:opacity-100">
+              <Button
+                size="sm"
+                variant="secondary"
+                onClick={() => handleDownload(results[currentImageIndex].url || "", currentImageIndex)}
+              >
+                <Download className="mr-2 h-4 w-4" />
+                Download
+              </Button>
+            </div>
+
+            {results.length > 1 && (
+              <div className="absolute bottom-14 left-1/2 -translate-x-1/2 flex gap-1.5">
+                {results.map((_, i) => (
+                  <button
+                    key={i}
+                    onClick={() => setCurrentImageIndex(i)}
+                    className={cn(
+                      "h-2 w-2 rounded-full transition-colors",
+                      i === currentImageIndex ? "bg-foreground" : "bg-foreground/30"
+                    )}
+                  />
+                ))}
+              </div>
+            )}
+            
+            {results[currentImageIndex].revised_prompt && (
+              <div className="absolute bottom-0 left-0 right-0 bg-background/80 p-3 backdrop-blur-sm">
+                <p className="text-xs text-muted-foreground line-clamp-2">{results[currentImageIndex].revised_prompt}</p>
+              </div>
+            )}
+          </Card>
         )}
       </div>
     </div>
