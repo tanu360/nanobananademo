@@ -32,7 +32,7 @@ const Index = () => {
 
       <main className="container py-8 flex-1">
         <div className="mx-auto max-w-5xl">
-          <div className="mb-8 text-center">
+          <div className="mb-6 text-center">
             <h2 className="mb-2 text-3xl font-bold tracking-tight">AI Image Playground</h2>
             <p className="text-muted-foreground">
               Generate, edit, and upscale images using advanced AI models

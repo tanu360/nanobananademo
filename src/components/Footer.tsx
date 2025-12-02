@@ -60,7 +60,7 @@ export function Footer({ onTabChange }: FooterProps) {
                 className="flex items-center gap-2 hover:text-foreground transition-colors"
               >
                 <ExternalLink className="h-4 w-4" />
-                API Documentation
+                API Info
               </a>
               <a
                 href="https://github.com/tanu360"
@@ -88,7 +88,7 @@ export function Footer({ onTabChange }: FooterProps) {
           </div>
         </div>
 
-        <div className="mt-8 pt-6 text-center text-sm text-muted-foreground">
+        <div className="mt-6 pt-4 text-center text-sm text-muted-foreground">
           <p>
             © {new Date().getFullYear()} Nano Banana. Powered by{" "}
             <a
