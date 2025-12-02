@@ -13,10 +13,10 @@ export function OptionCard({ selected, onClick, children, className }: OptionCar
       type="button"
       onClick={onClick}
       className={cn(
-        "flex flex-col items-center justify-center rounded-lg border px-4 py-3 text-center transition-colors",
+        "flex flex-col items-center justify-center rounded-md border px-4 py-3 text-center transition-colors",
         selected
-          ? "border-primary bg-primary/10 text-foreground"
-          : "border-border bg-background text-muted-foreground hover:border-primary/50 hover:bg-muted/50",
+          ? "border-foreground bg-foreground/5 text-foreground"
+          : "border-border bg-background text-muted-foreground hover:border-foreground/50 hover:bg-muted/50",
         className
       )}
     >
@@ -59,6 +59,6 @@ export function AspectRatioIcon({ ratio, className }: AspectRatioIconProps) {
   };
 
   return (
-    <div className={cn("rounded-sm bg-primary", getIconStyle(), className)} />
+    <div className={cn("bg-foreground", getIconStyle(), className)} />
   );
 }
