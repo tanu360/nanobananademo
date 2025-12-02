@@ -26,24 +26,16 @@ export function Header() {
 
         <div className="flex items-center gap-1">
           <Button variant="ghost" size="sm" className="gap-2 text-muted-foreground hover:text-foreground" asChild>
-            <a
-              href="https://nanobanana.aikit.club"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
+            <a href="https://nano-banana-api.readme.io/" target="_blank" rel="noopener noreferrer">
               <span className="hidden sm:inline text-xs">API Docs</span>
               <ExternalLink className="h-3.5 w-3.5" />
             </a>
           </Button>
-          
+
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="ghost" size="icon" className="h-9 w-9">
-                {resolvedTheme === "dark" ? (
-                  <Moon className="h-4 w-4" />
-                ) : (
-                  <Sun className="h-4 w-4" />
-                )}
+                {resolvedTheme === "dark" ? <Moon className="h-4 w-4" /> : <Sun className="h-4 w-4" />}
                 <span className="sr-only">Toggle theme</span>
               </Button>
             </DropdownMenuTrigger>
