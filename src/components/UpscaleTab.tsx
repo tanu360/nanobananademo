@@ -93,6 +93,7 @@ export function UpscaleTab() {
   };
 
   const previewImage = imageSource === "url" ? imageUrl : uploadedImage;
+  const resultImage = result?.url || (result?.b64_json ? `data:image/png;base64,${result.b64_json}` : null);
 
   return (
     <div className="grid gap-6 lg:grid-cols-2">
@@ -131,16 +132,16 @@ export function UpscaleTab() {
               className="hidden"
             />
             {uploadedImage ? (
-              <div className="relative">
+              <div className="relative inline-block">
                 <img
                   src={uploadedImage}
                   alt="Uploaded"
-                  className="max-h-40 rounded-lg border object-contain"
+                  className="max-h-40 rounded-md border object-contain"
                 />
                 <Button
                   size="icon"
                   variant="destructive"
-                  className="absolute -right-2 -top-2 h-6 w-6 rounded-lg"
+                  className="absolute -right-2 -top-2 h-6 w-6 rounded-full"
                   onClick={clearUpload}
                 >
                   <X className="h-3 w-3" />
@@ -193,51 +194,51 @@ export function UpscaleTab() {
         </Button>
       </div>
 
-      <div className="flex flex-col">
-        <div className="grid h-full gap-4 sm:grid-cols-2">
-          <div className="flex flex-col space-y-2">
-            <Label>Original</Label>
-            <Card className="flex-1 overflow-hidden rounded-md">
-              {previewImage ? (
-                <img src={previewImage} alt="Original" className="h-full w-full object-cover" />
-              ) : (
-                <CardContent className="flex h-full min-h-[300px] items-center justify-center text-muted-foreground">
-                  <p className="text-sm">No image selected</p>
-                </CardContent>
-              )}
-            </Card>
-          </div>
-
-          <div className="flex flex-col space-y-2">
-            <Label>Upscaled</Label>
-            <Card className="group relative flex-1 overflow-hidden rounded-md">
-              {result ? (
-                <>
-                  <img
-                    src={result.url || `data:image/png;base64,${result.b64_json}`}
-                    alt="Upscaled"
-                    className="h-full w-full object-cover"
-                  />
-                  <div className="absolute inset-0 flex items-center justify-center bg-foreground/60 opacity-0 transition-opacity group-hover:opacity-100">
+      <div className="flex flex-col space-y-2">
+        <Card className="flex-1 overflow-hidden rounded-md">
+          {previewImage || resultImage ? (
+            <div className="relative h-full min-h-[300px]">
+              <div className="flex h-full">
+                <div 
+                  className={`relative transition-all duration-300 ${resultImage ? 'w-1/2 border-r border-border' : 'w-full'}`}
+                >
+                  {previewImage ? (
+                    <>
+                      <img src={previewImage} alt="Original" className="h-full w-full object-cover" />
+                      <span className="absolute left-2 top-2 rounded bg-background/80 px-2 py-1 text-xs font-medium backdrop-blur-sm">
+                        Before
+                      </span>
+                    </>
+                  ) : (
+                    <div className="flex h-full items-center justify-center text-muted-foreground">
+                      <p className="text-sm">No image selected</p>
+                    </div>
+                  )}
+                </div>
+                
+                {resultImage && (
+                  <div className="relative w-1/2">
+                    <img src={resultImage} alt="Upscaled" className="h-full w-full object-cover" />
+                    <span className="absolute left-2 top-2 rounded bg-background/80 px-2 py-1 text-xs font-medium backdrop-blur-sm">
+                      After
+                    </span>
                     <Button
-                      size="sm"
-                      variant="secondary"
-                      onClick={() => handleDownload(result.url || "")}
-                      className="rounded-md"
+                      size="icon"
+                      className="absolute bottom-3 right-3 h-10 w-10 rounded-full bg-primary hover:bg-primary/90"
+                      onClick={() => handleDownload(result?.url || "")}
                     >
-                      <Download className="mr-2 h-4 w-4" />
-                      Download
+                      <Download className="h-4 w-4" />
                     </Button>
                   </div>
-                </>
-              ) : (
-                <CardContent className="flex h-full min-h-[300px] items-center justify-center text-muted-foreground">
-                  <p className="text-sm">Result will appear here</p>
-                </CardContent>
-              )}
-            </Card>
-          </div>
-        </div>
+                )}
+              </div>
+            </div>
+          ) : (
+            <CardContent className="flex h-full min-h-[300px] items-center justify-center text-muted-foreground">
+              <p className="text-sm">Upload or provide an image to get started</p>
+            </CardContent>
+          )}
+        </Card>
       </div>
     </div>
   );

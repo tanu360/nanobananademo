@@ -9,9 +9,9 @@ export function Footer({ onTabChange }: FooterProps) {
   return (
     <footer className="border-t py-8 mt-auto">
       <div className="container">
-        <div className="grid gap-8 md:grid-cols-3">
-          {/* Brand */}
-          <div className="space-y-3">
+        <div className="flex flex-col md:flex-row md:justify-between gap-8">
+          {/* Brand - Left */}
+          <div className="space-y-3 md:max-w-xs">
             <div className="flex items-center gap-2">
               <span className="text-xl">🍌</span>
               <span className="font-semibold">Nano Banana</span>
@@ -21,7 +21,7 @@ export function Footer({ onTabChange }: FooterProps) {
             </p>
           </div>
 
-          {/* Features */}
+          {/* Features - Center */}
           <div className="space-y-3">
             <h4 className="font-medium">Features</h4>
             <nav className="flex flex-col gap-2 text-sm text-muted-foreground">
@@ -49,7 +49,7 @@ export function Footer({ onTabChange }: FooterProps) {
             </nav>
           </div>
 
-          {/* Links */}
+          {/* Links - Right */}
           <div className="space-y-3">
             <h4 className="font-medium">Links</h4>
             <nav className="flex flex-col gap-2 text-sm text-muted-foreground">
@@ -71,7 +71,7 @@ export function Footer({ onTabChange }: FooterProps) {
           </div>
         </div>
 
-        <div className="mt-8 pt-6 border-t text-center text-sm text-muted-foreground">
+        <div className="mt-8 pt-6 text-center text-sm text-muted-foreground">
           <p>
             © {new Date().getFullYear()} Nano Banana. Powered by{" "}
             <a
