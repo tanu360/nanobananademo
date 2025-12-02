@@ -17,7 +17,7 @@ import {
    Dialog,
    DialogContent,
 } from "@/components/ui/dialog";
-import { Download, Trash2, Sparkles, Pencil, ZoomIn, Clock, X } from "lucide-react";
+import { Download, Trash2, Sparkles, Pencil, ZoomIn, Clock, X, ImageIcon } from "lucide-react";
 import {
    getHistory,
    deleteHistoryItem,
@@ -34,7 +34,7 @@ const typeIcons = {
 };
 
 // All badges use white background in light, zinc in dark
-const typeBadgeClass = "bg-white dark:bg-zinc-800 backdrop-blur-sm";
+const typeBadgeClass = "bg-white/90 dark:bg-zinc-800/90 backdrop-blur-sm shadow-lg";
 
 const typeLabels = {
    generate: "Generated",
@@ -172,70 +172,84 @@ export function HistoryTab() {
 
          {/* Gallery Grid */}
          {loading ? (
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3">
+            <div className="columns-2 sm:columns-3 md:columns-4 lg:columns-5 gap-4 space-y-4">
                {[...Array(10)].map((_, i) => (
-                  <div key={i} className="aspect-square bg-muted animate-pulse rounded-lg" />
+                  <div
+                     key={i}
+                     className="bg-muted animate-pulse rounded-2xl break-inside-avoid"
+                     style={{ height: `${150 + Math.random() * 100}px` }}
+                  />
                ))}
             </div>
          ) : history.length === 0 ? (
-            <Card className="flex min-h-[300px] items-center justify-center border-dashed">
-               <CardContent className="text-center text-muted-foreground">
-                  <Clock className="mx-auto mb-2 h-8 w-8 opacity-50" />
-                  <p className="font-medium">No history yet</p>
-                  <p className="text-sm">Generated images will appear here</p>
+            <Card className="flex min-h-[400px] items-center justify-center border-dashed border-2 rounded-2xl bg-gradient-to-br from-muted/30 to-muted/10">
+               <CardContent className="text-center text-muted-foreground py-12">
+                  <div className="mx-auto mb-4 h-16 w-16 rounded-full bg-muted/50 flex items-center justify-center">
+                     <ImageIcon className="h-8 w-8 opacity-50" />
+                  </div>
+                  <p className="font-semibold text-lg mb-1">No history yet</p>
+                  <p className="text-sm opacity-70">Your generated images will appear here</p>
                </CardContent>
             </Card>
          ) : (
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3">
-               {history.map((item) => {
+            <div className="columns-2 sm:columns-3 md:columns-4 lg:columns-5 gap-4 space-y-4">
+               {history.map((item, index) => {
                   const Icon = typeIcons[item.type];
-                  const modelName = getModelName(item);
                   return (
-                     <Card
+                     <div
                         key={item.id}
-                        className="group relative aspect-square overflow-hidden cursor-pointer hover:ring-2 hover:ring-primary transition-all"
+                        className="group relative break-inside-avoid cursor-pointer"
+                        style={{ animationDelay: `${index * 50}ms` }}
                         onClick={() => setSelectedItem(item)}
                      >
-                        <img
-                           src={item.thumbnailUrl || item.imageUrl}
-                           alt={item.prompt || item.type}
-                           className="w-full h-full object-cover"
-                           loading="lazy"
-                        />
+                        <div className="relative overflow-hidden rounded-2xl bg-muted/20 shadow-sm hover:shadow-xl transition-all duration-300 transform hover:scale-[1.02]">
+                           <img
+                              src={item.thumbnailUrl || item.imageUrl}
+                              alt={item.prompt || item.type}
+                              className="w-full h-auto object-cover"
+                              loading="lazy"
+                           />
 
-                        {/* Type badge */}
-                        <div className={cn(
-                           "absolute top-2 left-2 p-1.5 rounded-full",
-                           typeBadgeClass
-                        )}>
-                           <Icon className="h-3 w-3 text-black dark:text-white" />
-                        </div>
+                           {/* Type badge */}
+                           <div className={cn(
+                              "absolute top-2.5 left-2.5 p-1.5 rounded-full",
+                              typeBadgeClass
+                           )}>
+                              <Icon className="h-3 w-3 text-black dark:text-white" />
+                           </div>
 
-                        {/* Hover overlay */}
-                        <div className="absolute inset-0 bg-black/70 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col justify-between p-2">
-                           <div className="flex justify-end gap-1">
+                           {/* Gradient overlay on hover */}
+                           <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-all duration-300" />
+
+                           {/* Action buttons - appear on hover */}
+                           <div className="absolute top-2.5 right-2.5 flex gap-1.5 opacity-0 group-hover:opacity-100 transition-all duration-300 transform translate-y-2 group-hover:translate-y-0">
                               <Button
                                  size="icon"
                                  variant="ghost"
-                                 className="h-8 w-8 rounded-full bg-white dark:bg-zinc-800 hover:bg-white dark:hover:bg-zinc-800 text-black dark:text-white backdrop-blur-sm"
+                                 className="h-8 w-8 rounded-full bg-white/90 dark:bg-zinc-800/90 hover:bg-white dark:hover:bg-zinc-700 text-black dark:text-white shadow-lg backdrop-blur-sm"
                                  onClick={(e) => handleDownload(item, e)}
                               >
-                                 <Download className="h-4 w-4" />
+                                 <Download className="h-3.5 w-3.5" />
                               </Button>
                               <Button
                                  size="icon"
                                  variant="ghost"
-                                 className="h-8 w-8 rounded-full bg-white dark:bg-zinc-800 hover:bg-white dark:hover:bg-zinc-800 text-red-500 backdrop-blur-sm"
+                                 className="h-8 w-8 rounded-full bg-white/90 dark:bg-zinc-800/90 hover:bg-red-500 hover:text-white text-red-500 dark:text-red-400 shadow-lg backdrop-blur-sm transition-colors"
                                  onClick={(e) => handleDelete(item.id, e)}
                               >
-                                 <Trash2 className="h-4 w-4" />
+                                 <Trash2 className="h-3.5 w-3.5" />
                               </Button>
                            </div>
-                           <div className="text-white text-xs">
-                              <p className="opacity-70">{formatRelativeTime(item.timestamp)}</p>
+
+                           {/* Bottom info - appears on hover */}
+                           <div className="absolute bottom-0 left-0 right-0 p-3 opacity-0 group-hover:opacity-100 transition-all duration-300 transform translate-y-2 group-hover:translate-y-0">
+                              <div className="flex items-center gap-1.5 text-white/90">
+                                 <Clock className="h-3 w-3" />
+                                 <span className="text-[10px] font-medium">{formatRelativeTime(item.timestamp)}</span>
+                              </div>
                            </div>
                         </div>
-                     </Card>
+                     </div>
                   );
                })}
             </div>
