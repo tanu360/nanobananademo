@@ -387,21 +387,21 @@ export function GenerateTab() {
         </Button>
       </div>
 
-      <div className="flex flex-col space-y-4">
+      <div className="space-y-4">
         <Label>Results {results.length > 1 && `(${currentImageIndex + 1}/${results.length})`}</Label>
         {results.length === 0 ? (
-          <Card className="flex flex-1 min-h-[300px] items-center justify-center border-dashed">
+          <Card className="flex min-h-[300px] items-center justify-center border-dashed">
             <CardContent className="text-center text-muted-foreground">
               <Sparkles className="mx-auto mb-2 h-8 w-8 opacity-50" />
               <p>Generated images will appear here</p>
             </CardContent>
           </Card>
         ) : (
-          <Card className="group relative flex-1 min-h-[300px] overflow-hidden">
+          <Card className="group relative overflow-hidden">
             <img
               src={results[currentImageIndex].url || `data:image/png;base64,${results[currentImageIndex].b64_json}`}
               alt={`Generated ${currentImageIndex + 1}`}
-              className="h-full w-full object-contain"
+              className="w-full object-contain"
             />
             
             {results.length > 1 && (
@@ -409,26 +409,27 @@ export function GenerateTab() {
                 <Button
                   size="icon"
                   variant="secondary"
-                  className="absolute left-2 top-1/2 -translate-y-1/2 h-8 w-8 rounded-md opacity-0 transition-opacity group-hover:opacity-100"
+                  className="absolute left-2 top-1/2 -translate-y-1/2 h-10 w-10 rounded-full"
                   onClick={goToPrevImage}
                 >
-                  <ChevronLeft className="h-4 w-4" />
+                  <ChevronLeft className="h-5 w-5" />
                 </Button>
                 <Button
                   size="icon"
                   variant="secondary"
-                  className="absolute right-2 top-1/2 -translate-y-1/2 h-8 w-8 rounded-md opacity-0 transition-opacity group-hover:opacity-100"
+                  className="absolute right-2 top-1/2 -translate-y-1/2 h-10 w-10 rounded-full"
                   onClick={goToNextImage}
                 >
-                  <ChevronRight className="h-4 w-4" />
+                  <ChevronRight className="h-5 w-5" />
                 </Button>
               </>
             )}
             
-            <div className="absolute bottom-4 left-1/2 -translate-x-1/2 opacity-0 transition-opacity group-hover:opacity-100">
+            <div className="absolute bottom-4 left-1/2 -translate-x-1/2">
               <Button
                 size="sm"
                 variant="secondary"
+                className="bg-background/90 backdrop-blur-sm"
                 onClick={() => handleDownload(results[currentImageIndex].url || "", currentImageIndex)}
               >
                 <Download className="mr-2 h-4 w-4" />
@@ -448,12 +449,6 @@ export function GenerateTab() {
                     )}
                   />
                 ))}
-              </div>
-            )}
-            
-            {results[currentImageIndex].revised_prompt && (
-              <div className="absolute bottom-0 left-0 right-0 bg-background/80 p-3 backdrop-blur-sm">
-                <p className="text-xs text-muted-foreground line-clamp-2">{results[currentImageIndex].revised_prompt}</p>
               </div>
             )}
           </Card>

@@ -209,7 +209,7 @@ export function UpscaleTab() {
           </div>
 
           <div className="flex flex-col space-y-2">
-            <Label>Upscaled ({upscaleFactor})</Label>
+            <Label>Upscaled</Label>
             <Card className="group relative flex-1 overflow-hidden rounded-md">
               {result ? (
                 <>
