@@ -94,7 +94,7 @@ export function UpscaleTab() {
       const downloadUrl = URL.createObjectURL(blob);
       const a = document.createElement("a");
       a.href = downloadUrl;
-      a.download = `nano-banana-upscaled-${upscaleFactor}-${Date.now()}.png`;
+      a.download = `nanobanana-upscaled-${upscaleFactor}-${Date.now()}.png`;
       document.body.appendChild(a);
       a.click();
       document.body.removeChild(a);

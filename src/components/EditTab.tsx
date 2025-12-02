@@ -95,7 +95,7 @@ export function EditTab() {
       const downloadUrl = URL.createObjectURL(blob);
       const a = document.createElement("a");
       a.href = downloadUrl;
-      a.download = `nano-banana-edited-${Date.now()}.png`;
+      a.download = `nanobanana-edited-${Date.now()}.png`;
       document.body.appendChild(a);
       a.click();
       document.body.removeChild(a);

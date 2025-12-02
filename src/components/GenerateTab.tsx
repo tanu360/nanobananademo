@@ -133,7 +133,7 @@ export function GenerateTab() {
       const downloadUrl = URL.createObjectURL(blob);
       const a = document.createElement("a");
       a.href = downloadUrl;
-      a.download = `nano-banana-${Date.now()}-${index}.png`;
+      a.download = `nanobanana-${Date.now()}-${index}.png`;
       document.body.appendChild(a);
       a.click();
       document.body.removeChild(a);
@@ -399,7 +399,8 @@ export function GenerateTab() {
         ) : (
           <Card className="group relative overflow-hidden">
             <img
-              src={results[currentImageIndex].url || `data:image/png;base64,${results[currentImageIndex].b64_json}`}
+              key={currentImageIndex}
+              src={results[currentImageIndex]?.url || `data:image/png;base64,${results[currentImageIndex]?.b64_json}`}
               alt={`Generated ${currentImageIndex + 1}`}
               className="w-full object-contain"
             />
