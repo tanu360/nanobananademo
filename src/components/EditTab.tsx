@@ -116,6 +116,7 @@ export function EditTab() {
               placeholder="https://example.com/image.png"
               value={imageUrl}
               onChange={(e) => setImageUrl(e.target.value)}
+              className="rounded-lg"
             />
           </TabsContent>
 
@@ -138,7 +139,7 @@ export function EditTab() {
                 <Button
                   size="icon"
                   variant="destructive"
-                  className="absolute -right-2 -top-2 h-6 w-6"
+                  className="absolute -right-2 -top-2 h-6 w-6 rounded-lg"
                   onClick={clearUpload}
                 >
                   <X className="h-3 w-3" />
@@ -147,7 +148,7 @@ export function EditTab() {
             ) : (
               <Button
                 variant="outline"
-                className="w-full border-dashed py-8"
+                className="w-full border-dashed py-8 rounded-lg"
                 onClick={() => fileInputRef.current?.click()}
               >
                 <Upload className="mr-2 h-4 w-4" />
@@ -164,11 +165,11 @@ export function EditTab() {
             placeholder="Add a rainbow in the sky, make it more vibrant..."
             value={prompt}
             onChange={(e) => setPrompt(e.target.value)}
-            className="min-h-[120px] resize-none"
+            className="min-h-[100px] resize-none rounded-lg"
           />
         </div>
 
-        <Button onClick={handleEdit} disabled={loading} className="w-full" size="lg">
+        <Button onClick={handleEdit} disabled={loading} className="w-full rounded-lg" size="lg">
           {loading ? (
             <>
               <Loader2 className="mr-2 h-4 w-4 animate-spin" />
@@ -187,7 +188,7 @@ export function EditTab() {
         <div className="grid gap-4 sm:grid-cols-2">
           <div className="space-y-2">
             <Label>Original</Label>
-            <Card className="overflow-hidden">
+            <Card className="overflow-hidden rounded-lg">
               {previewImage ? (
                 <img src={previewImage} alt="Original" className="w-full object-cover" />
               ) : (
@@ -200,7 +201,7 @@ export function EditTab() {
 
           <div className="space-y-2">
             <Label>Result</Label>
-            <Card className="group relative overflow-hidden">
+            <Card className="group relative overflow-hidden rounded-lg">
               {result ? (
                 <>
                   <img
@@ -213,6 +214,7 @@ export function EditTab() {
                       size="sm"
                       variant="secondary"
                       onClick={() => handleDownload(result.url || "")}
+                      className="rounded-lg"
                     >
                       <Download className="mr-2 h-4 w-4" />
                       Download
