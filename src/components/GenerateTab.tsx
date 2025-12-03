@@ -189,7 +189,7 @@ export function GenerateTab({ initialData, onInitialDataConsumed, onLoad }: Gene
           <div className="flex items-center justify-between">
             <Label htmlFor="prompt">Prompt</Label>
             <span className="text-xs text-muted-foreground">
-              {prompt.length} / 1000
+              {prompt.length} / 4096
             </span>
           </div>
           <Textarea
@@ -198,7 +198,7 @@ export function GenerateTab({ initialData, onInitialDataConsumed, onLoad }: Gene
             value={prompt}
             onChange={(e) => setPrompt(e.target.value)}
             className="min-h-[174px] resize-none"
-            maxLength={1000}
+            maxLength={4096}
           />
         </div>
 
