@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
 import {
    AlertDialog,
    AlertDialogAction,
@@ -18,8 +19,15 @@ import {
    DialogContent,
    DialogTitle,
 } from "@/components/ui/dialog";
+import {
+   Select,
+   SelectContent,
+   SelectItem,
+   SelectTrigger,
+   SelectValue,
+} from "@/components/ui/select";
 import * as VisuallyHidden from "@radix-ui/react-visually-hidden";
-import { Download, Trash2, Sparkles, Pencil, ZoomIn, Clock, X, ImageIcon, RefreshCw } from "lucide-react";
+import { Download, Trash2, Sparkles, Pencil, ZoomIn, Clock, X, ImageIcon, RefreshCw, Search, Filter } from "lucide-react";
 import {
    getHistory,
    deleteHistoryItem,
@@ -55,6 +63,9 @@ export function HistoryTab({ onRegenerate, onEdit, onUpscale, onLoad }: HistoryT
    const [history, setHistory] = useState<HistoryItem[]>([]);
    const [loading, setLoading] = useState(true);
    const [selectedItem, setSelectedItem] = useState<HistoryItem | null>(null);
+   const [searchQuery, setSearchQuery] = useState("");
+   const [filterType, setFilterType] = useState<"all" | "generate" | "edit" | "upscale">("all");
+   const [sortBy, setSortBy] = useState<"newest" | "oldest">("newest");
 
    const loadHistory = async () => {
       setLoading(true);
@@ -135,13 +146,37 @@ export function HistoryTab({ onRegenerate, onEdit, onUpscale, onLoad }: HistoryT
       return null;
    };
 
+   // Filter and sort history
+   const filteredAndSortedHistory = history
+      .filter((item) => {
+         // Filter by type
+         if (filterType !== "all" && item.type !== filterType) return false;
+
+         // Filter by search query
+         if (searchQuery.trim()) {
+            const query = searchQuery.toLowerCase();
+            const prompt = (item.prompt || "").toLowerCase();
+            const model = getModelName(item)?.toLowerCase() || "";
+            return prompt.includes(query) || model.includes(query);
+         }
+
+         return true;
+      })
+      .sort((a, b) => {
+         if (sortBy === "newest") {
+            return b.timestamp - a.timestamp;
+         } else {
+            return a.timestamp - b.timestamp;
+         }
+      });
+
    return (
       <div className="space-y-6">
          {/* Header with count and clear button */}
          <div className="flex items-center justify-between">
             <Label className="flex items-center gap-2">
                History
-               <span className="text-muted-foreground">({history.length})</span>
+               <span className="text-muted-foreground">({filteredAndSortedHistory.length}{filteredAndSortedHistory.length !== history.length && ` of ${history.length}`})</span>
                {history.length > 0 && (
                   <AlertDialog>
                      <AlertDialogTrigger asChild>
@@ -172,6 +207,43 @@ export function HistoryTab({ onRegenerate, onEdit, onUpscale, onLoad }: HistoryT
             </Label>
          </div>
 
+         {/* Search and Filter Controls */}
+         {history.length > 0 && (
+            <div className="grid gap-3 sm:grid-cols-3">
+               <div className="relative sm:col-span-1">
+                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                  <Input
+                     placeholder="Search prompts or models..."
+                     value={searchQuery}
+                     onChange={(e) => setSearchQuery(e.target.value)}
+                     className="pl-9"
+                  />
+               </div>
+               <Select value={filterType} onValueChange={(value: typeof filterType) => setFilterType(value)}>
+                  <SelectTrigger>
+                     <Filter className="mr-2 h-4 w-4" />
+                     <SelectValue placeholder="Filter by type" />
+                  </SelectTrigger>
+                  <SelectContent>
+                     <SelectItem value="all">All Types</SelectItem>
+                     <SelectItem value="generate">Generated</SelectItem>
+                     <SelectItem value="edit">Edited</SelectItem>
+                     <SelectItem value="upscale">Upscaled</SelectItem>
+                  </SelectContent>
+               </Select>
+               <Select value={sortBy} onValueChange={(value: typeof sortBy) => setSortBy(value)}>
+                  <SelectTrigger>
+                     <Clock className="mr-2 h-4 w-4" />
+                     <SelectValue placeholder="Sort by" />
+                  </SelectTrigger>
+                  <SelectContent>
+                     <SelectItem value="newest">Newest First</SelectItem>
+                     <SelectItem value="oldest">Oldest First</SelectItem>
+                  </SelectContent>
+               </Select>
+            </div>
+         )}
+
          {/* Gallery Grid */}
          {loading ? (
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
@@ -182,19 +254,29 @@ export function HistoryTab({ onRegenerate, onEdit, onUpscale, onLoad }: HistoryT
                   />
                ))}
             </div>
-         ) : history.length === 0 ? (
+         ) : filteredAndSortedHistory.length === 0 ? (
             <Card className="flex min-h-[300px] items-center justify-center border-dashed border-2 rounded-2xl bg-gradient-to-br from-muted/30 to-muted/10">
                <CardContent className="text-center text-muted-foreground py-12">
                   <div className="mx-auto mb-4 h-16 w-16 rounded-full bg-muted/50 flex items-center justify-center">
-                     <ImageIcon className="h-8 w-8 opacity-50" />
+                     {history.length === 0 ? (
+                        <ImageIcon className="h-8 w-8 opacity-50" />
+                     ) : (
+                        <Search className="h-8 w-8 opacity-50" />
+                     )}
                   </div>
-                  <p className="font-semibold text-lg mb-1">No history yet</p>
-                  <p className="text-sm opacity-70">Your generated images will appear here</p>
+                  <p className="font-semibold text-lg mb-1">
+                     {history.length === 0 ? "No history yet" : "No results found"}
+                  </p>
+                  <p className="text-sm opacity-70">
+                     {history.length === 0
+                        ? "Your generated images will appear here"
+                        : "Try adjusting your search or filters"}
+                  </p>
                </CardContent>
             </Card>
          ) : (
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
-               {history.map((item, index) => {
+               {filteredAndSortedHistory.map((item, index) => {
                   const Icon = typeIcons[item.type];
                   return (
                      <div

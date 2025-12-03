@@ -186,13 +186,19 @@ export function GenerateTab({ initialData, onInitialDataConsumed, onLoad }: Gene
     <div className="grid gap-6 lg:grid-cols-2">
       <div className="space-y-6">
         <div className="space-y-2">
-          <Label htmlFor="prompt">Prompt</Label>
+          <div className="flex items-center justify-between">
+            <Label htmlFor="prompt">Prompt</Label>
+            <span className="text-xs text-muted-foreground">
+              {prompt.length} / 1000
+            </span>
+          </div>
           <Textarea
             id="prompt"
             placeholder="A serene mountain landscape at sunset with golden light reflecting off a calm lake..."
             value={prompt}
             onChange={(e) => setPrompt(e.target.value)}
             className="min-h-[174px] resize-none"
+            maxLength={1000}
           />
         </div>
 
@@ -350,12 +356,18 @@ export function GenerateTab({ initialData, onInitialDataConsumed, onLoad }: Gene
 
             {/* Negative Prompt */}
             <div className="space-y-2">
-              <Label htmlFor="negative" className="text-muted-foreground">Negative Prompt</Label>
+              <div className="flex items-center justify-between">
+                <Label htmlFor="negative" className="text-muted-foreground">Negative Prompt</Label>
+                <span className="text-xs text-muted-foreground">
+                  {negativePrompt.length} / 500
+                </span>
+              </div>
               <Input
                 id="negative"
                 placeholder="blur, low quality, distortion..."
                 value={negativePrompt}
                 onChange={(e) => setNegativePrompt(e.target.value)}
+                maxLength={500}
               />
             </div>
 
@@ -417,14 +429,33 @@ export function GenerateTab({ initialData, onInitialDataConsumed, onLoad }: Gene
       <div className="space-y-4">
         <Label>Results {results.length > 1 && `(${currentImageIndex + 1}/${results.length})`}</Label>
         {results.length === 0 ? (
-          <Card className="flex min-h-[300px] items-center justify-center border-dashed">
+          <Card className="flex min-h-[288px] items-center justify-center border-dashed">
             <CardContent className="text-center text-muted-foreground">
               {loading ? (
-                <Loader2 className="mx-auto mb-2 h-8 w-8 animate-spin" />
+                <div className="space-y-3">
+                  <Loader2 className="mx-auto mb-2 h-8 w-8 animate-spin" />
+                  <p className="font-medium">Generating your image...</p>
+                  <div className="flex flex-col gap-2 text-xs">
+                    <div className="flex items-center justify-center gap-2">
+                      <div className="h-1.5 w-1.5 rounded-full bg-primary animate-pulse" />
+                      <span>Processing prompt</span>
+                    </div>
+                    <div className="flex items-center justify-center gap-2">
+                      <div className="h-1.5 w-1.5 rounded-full bg-primary animate-pulse [animation-delay:0.2s]" />
+                      <span>Creating image</span>
+                    </div>
+                    <div className="flex items-center justify-center gap-2">
+                      <div className="h-1.5 w-1.5 rounded-full bg-primary animate-pulse [animation-delay:0.4s]" />
+                      <span>Finalizing</span>
+                    </div>
+                  </div>
+                </div>
               ) : (
-                <Sparkles className="mx-auto mb-2 h-8 w-8 opacity-50" />
+                <>
+                  <Sparkles className="mx-auto mb-2 h-8 w-8 opacity-50" />
+                  <p>Generated images will appear here</p>
+                </>
               )}
-              <p>Generated images will appear here</p>
             </CardContent>
           </Card>
         ) : (

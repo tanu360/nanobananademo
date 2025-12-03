@@ -265,13 +265,19 @@ export function EditTab({ initialData, onInitialDataConsumed, onLoad }: EditTabP
         </Tabs>
 
         <div className="space-y-2">
-          <Label htmlFor="edit-prompt">Edit Instructions</Label>
+          <div className="flex items-center justify-between">
+            <Label htmlFor="edit-prompt">Edit Instructions</Label>
+            <span className="text-xs text-muted-foreground">
+              {prompt.length} / 500
+            </span>
+          </div>
           <Textarea
             id="edit-prompt"
             placeholder="Add a rainbow in the sky, make it more vibrant..."
             value={prompt}
             onChange={(e) => setPrompt(e.target.value)}
             className="min-h-[100px] resize-none rounded-lg"
+            maxLength={500}
           />
         </div>
 
