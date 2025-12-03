@@ -366,9 +366,18 @@ export function GenerateTab({ initialData, onInitialDataConsumed, onLoad }: Gene
               <Input
                 id="seed"
                 type="number"
+                min="0"
+                max="2147483647"
                 placeholder={enhancePrompt ? "Disabled with Enhance Prompt" : "Random seed for reproducible results"}
                 value={seed}
-                onChange={(e) => setSeed(e.target.value)}
+                onChange={(e) => {
+                  const value = e.target.value;
+                  const numValue = parseInt(value);
+                  // Only allow positive numbers within range
+                  if (value === "" || (numValue >= 0 && numValue <= 2147483647)) {
+                    setSeed(value);
+                  }
+                }}
                 disabled={enhancePrompt}
                 className={enhancePrompt ? "opacity-50 cursor-not-allowed" : ""}
               />
