@@ -359,7 +359,7 @@ export function GenerateTab({ initialData, onInitialDataConsumed, onLoad }: Gene
               <div className="flex items-center justify-between">
                 <Label htmlFor="negative" className="text-muted-foreground">Negative Prompt</Label>
                 <span className="text-xs text-muted-foreground">
-                  {negativePrompt.length} / 500
+                  {negativePrompt.length} / 1024
                 </span>
               </div>
               <Input
@@ -367,7 +367,7 @@ export function GenerateTab({ initialData, onInitialDataConsumed, onLoad }: Gene
                 placeholder="blur, low quality, distortion..."
                 value={negativePrompt}
                 onChange={(e) => setNegativePrompt(e.target.value)}
-                maxLength={500}
+                maxLength={1024}
               />
             </div>
 
