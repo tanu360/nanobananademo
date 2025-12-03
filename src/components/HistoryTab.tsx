@@ -332,8 +332,8 @@ export function HistoryTab({ onRegenerate, onEdit, onUpscale, onLoad }: HistoryT
                            {selectedItem.type === "generate" && selectedItem.prompt && onRegenerate && (
                               <Button
                                  size="sm"
-                                 variant="secondary"
-                                 className="flex-1"
+                                 variant="outline"
+                                 className="flex-1 bg-zinc-200 dark:bg-zinc-700 hover:bg-zinc-300 dark:hover:bg-zinc-600 border-zinc-300 dark:border-zinc-600"
                                  onClick={() => {
                                     const model = (selectedItem.params?.model as string) || "nano-banana";
                                     onRegenerate(selectedItem.prompt!, model);
@@ -347,8 +347,8 @@ export function HistoryTab({ onRegenerate, onEdit, onUpscale, onLoad }: HistoryT
                            {onEdit && (
                               <Button
                                  size="sm"
-                                 variant="secondary"
-                                 className="flex-1"
+                                 variant="outline"
+                                 className="flex-1 bg-zinc-200 dark:bg-zinc-700 hover:bg-zinc-300 dark:hover:bg-zinc-600 border-zinc-300 dark:border-zinc-600"
                                  onClick={() => {
                                     onEdit(selectedItem.imageUrl);
                                     setSelectedItem(null);
@@ -361,8 +361,8 @@ export function HistoryTab({ onRegenerate, onEdit, onUpscale, onLoad }: HistoryT
                            {onUpscale && (
                               <Button
                                  size="sm"
-                                 variant="secondary"
-                                 className="flex-1"
+                                 variant="outline"
+                                 className="flex-1 bg-zinc-200 dark:bg-zinc-700 hover:bg-zinc-300 dark:hover:bg-zinc-600 border-zinc-300 dark:border-zinc-600"
                                  onClick={() => {
                                     onUpscale(selectedItem.imageUrl);
                                     setSelectedItem(null);
