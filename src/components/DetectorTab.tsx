@@ -38,10 +38,8 @@ export function DetectorTab({ onLoad }: DetectorTabProps) {
       return (bytes / (1024 * 1024)).toFixed(1) + " MB";
    };
 
-   const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-      const file = e.target.files?.[0];
-      if (!file) return;
-
+   // Shared file processing logic for both file input and drag & drop
+   const processImageFile = useCallback((file: File) => {
       if (!ALLOWED_TYPES.includes(file.type)) {
          toast({ title: "Only JPG, PNG, GIF, WebP formats are supported", variant: "destructive" });
          return;
@@ -60,6 +58,12 @@ export function DetectorTab({ onLoad }: DetectorTabProps) {
          setImageSource("upload");
       };
       reader.readAsDataURL(file);
+   }, []);
+
+   const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+      const file = e.target.files?.[0];
+      if (!file) return;
+      processImageFile(file);
    };
 
    const handleDetect = async () => {
@@ -78,7 +82,7 @@ export function DetectorTab({ onLoad }: DetectorTabProps) {
          });
          setResult(response);
 
-         if (response.error === true) {
+         if (response.error) {
             toast({
                title: "Analysis Error",
                description: response.reasoning,
@@ -101,13 +105,18 @@ export function DetectorTab({ onLoad }: DetectorTabProps) {
       }
    };
 
-   const clearUpload = () => {
+   const clearUpload = useCallback(() => {
       setUploadedImage(null);
       setUploadedFileInfo(null);
       if (fileInputRef.current) {
          fileInputRef.current.value = "";
       }
-   };
+   }, []);
+
+   const handleClearUpload = useCallback((e: React.MouseEvent) => {
+      e.stopPropagation();
+      clearUpload();
+   }, [clearUpload]);
 
    // Drag and drop handlers
    const handleDragOver = useCallback((e: React.DragEvent) => {
@@ -129,46 +138,28 @@ export function DetectorTab({ onLoad }: DetectorTabProps) {
 
       const file = e.dataTransfer.files?.[0];
       if (!file) return;
-
-      if (!ALLOWED_TYPES.includes(file.type)) {
-         toast({ title: "Only JPG, PNG, GIF, WebP formats are supported", variant: "destructive" });
-         return;
-      }
-
-      if (file.size > MAX_FILE_SIZE) {
-         toast({ title: "File size must be less than 16MB", variant: "destructive" });
-         return;
-      }
-
-      setUploadedFileInfo({ name: file.name, size: formatFileSize(file.size) });
-
-      const reader = new FileReader();
-      reader.onload = (event) => {
-         setUploadedImage(event.target?.result as string);
-         setImageSource("upload");
-      };
-      reader.readAsDataURL(file);
-   }, []);
+      processImageFile(file);
+   }, [processImageFile]);
 
    const previewImage = imageSource === "url" ? imageUrl : uploadedImage;
 
    const getResultIcon = () => {
       if (!result) return null;
-      if (result.error === true) return <AlertCircle className="h-8 w-8 text-yellow-500" />;
+      if (result.error) return <AlertCircle className="h-8 w-8 text-yellow-500" />;
       if (result.isAIGenerated) return <ShieldAlert className="h-8 w-8 text-red-500" />;
       return <ShieldCheck className="h-8 w-8 text-green-500" />;
    };
 
    const getResultTitle = () => {
       if (!result) return "";
-      if (result.error === true) return "Analysis Error";
+      if (result.error) return "Analysis Error";
       if (result.isAIGenerated) return "AI-Generated Image";
       return "Human-Created Image";
    };
 
    const getResultBgColor = () => {
       if (!result) return "";
-      if (result.error === true) return "bg-yellow-500/10 border-yellow-500/30";
+      if (result.error) return "bg-yellow-500/10 border-yellow-500/30";
       if (result.isAIGenerated) return "bg-red-500/10 border-red-500/30";
       return "bg-green-500/10 border-green-500/30";
    };
@@ -225,7 +216,7 @@ export function DetectorTab({ onLoad }: DetectorTabProps) {
                               size="icon"
                               variant="destructive"
                               className="absolute right-2 top-2 h-5 w-5 rounded-full"
-                              onClick={(e) => { e.stopPropagation(); clearUpload(); }}
+                              onClick={handleClearUpload}
                            >
                               <X className="h-3 w-3" />
                            </Button>
@@ -295,10 +286,10 @@ export function DetectorTab({ onLoad }: DetectorTabProps) {
                      {result && (
                         <div className={cn(
                            "absolute top-3 right-3 px-3 py-1.5 rounded-full text-sm font-medium backdrop-blur-sm",
-                           result.error === true ? "bg-yellow-500/90 text-yellow-950" :
+                           result.error ? "bg-yellow-500/90 text-yellow-950" :
                               result.isAIGenerated ? "bg-red-500/90 text-white" : "bg-green-500/90 text-white"
                         )}>
-                           {result.error === true ? "Error" : result.isAIGenerated ? "AI Generated" : "Authentic"}
+                           {result.error ? "Error" : result.isAIGenerated ? "AI Generated" : "Authentic"}
                         </div>
                      )}
                   </div>
