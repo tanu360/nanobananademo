@@ -64,25 +64,6 @@ async function urlToBase64(url: string): Promise<string> {
    }
 }
 
-// Create thumbnail (smaller version for gallery)
-async function createThumbnail(base64: string, maxSize = 200): Promise<string> {
-   return new Promise((resolve) => {
-      const img = new Image();
-      img.onload = () => {
-         const canvas = document.createElement("canvas");
-         const ratio = Math.min(maxSize / img.width, maxSize / img.height);
-         canvas.width = img.width * ratio;
-         canvas.height = img.height * ratio;
-
-         const ctx = canvas.getContext("2d");
-         ctx?.drawImage(img, 0, 0, canvas.width, canvas.height);
-         resolve(canvas.toDataURL("image/jpeg", 0.7));
-      };
-      img.onerror = () => resolve(base64); // Fallback to original
-      img.src = base64;
-   });
-}
-
 // Save image to history
 export async function saveToHistory(
    type: HistoryItem["type"],
@@ -95,14 +76,13 @@ export async function saveToHistory(
 
       // Convert to base64 for persistent storage
       const base64 = await urlToBase64(imageUrl);
-      const thumbnail = await createThumbnail(base64);
 
       const item: HistoryItem = {
          id: `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
          type,
          prompt,
          imageUrl: base64,
-         thumbnailUrl: thumbnail,
+         thumbnailUrl: base64, // Use same image, no quality reduction
          timestamp: Date.now(),
          params,
       };
