@@ -192,7 +192,7 @@ export function GenerateTab({ initialData, onInitialDataConsumed, onLoad }: Gene
             placeholder="A serene mountain landscape at sunset with golden light reflecting off a calm lake..."
             value={prompt}
             onChange={(e) => setPrompt(e.target.value)}
-            className="min-h-[100px] resize-none"
+            className="min-h-[174px] resize-none"
           />
         </div>
 

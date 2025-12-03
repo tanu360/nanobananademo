@@ -183,7 +183,7 @@ export function HistoryTab({ onRegenerate, onEdit, onUpscale, onLoad }: HistoryT
                ))}
             </div>
          ) : history.length === 0 ? (
-            <Card className="flex min-h-[400px] items-center justify-center border-dashed border-2 rounded-2xl bg-gradient-to-br from-muted/30 to-muted/10">
+            <Card className="flex min-h-[300px] items-center justify-center border-dashed border-2 rounded-2xl bg-gradient-to-br from-muted/30 to-muted/10">
                <CardContent className="text-center text-muted-foreground py-12">
                   <div className="mx-auto mb-4 h-16 w-16 rounded-full bg-muted/50 flex items-center justify-center">
                      <ImageIcon className="h-8 w-8 opacity-50" />
