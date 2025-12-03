@@ -3,12 +3,13 @@ import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Sparkles, Pencil, ZoomIn, Clock } from "lucide-react";
+import { Sparkles, Pencil, ZoomIn, Clock, ShieldCheck } from "lucide-react";
 
 // Lazy load tab components for better performance
 const GenerateTab = lazy(() => import("@/components/GenerateTab").then(m => ({ default: m.GenerateTab })));
 const EditTab = lazy(() => import("@/components/EditTab").then(m => ({ default: m.EditTab })));
 const UpscaleTab = lazy(() => import("@/components/UpscaleTab").then(m => ({ default: m.UpscaleTab })));
+const DetectorTab = lazy(() => import("@/components/DetectorTab").then(m => ({ default: m.DetectorTab })));
 const HistoryTab = lazy(() => import("@/components/HistoryTab").then(m => ({ default: m.HistoryTab })));
 
 // Loading skeleton for tabs
@@ -85,7 +86,7 @@ const Index = () => {
           </div>
 
           <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-            <TabsList className="grid w-full grid-cols-4">
+            <TabsList className="grid w-full grid-cols-5">
               <TabsTrigger value="generate" className="gap-2">
                 <Sparkles className="h-4 w-4" />
                 <span className="hidden sm:inline">Generate</span>
@@ -97,6 +98,10 @@ const Index = () => {
               <TabsTrigger value="upscale" className="gap-2">
                 <ZoomIn className="h-4 w-4" />
                 <span className="hidden sm:inline">Upscale</span>
+              </TabsTrigger>
+              <TabsTrigger value="detector" className="gap-2">
+                <ShieldCheck className="h-4 w-4" />
+                <span className="hidden sm:inline">Detector</span>
               </TabsTrigger>
               <TabsTrigger value="history" className="gap-2">
                 <Clock className="h-4 w-4" />
@@ -130,6 +135,14 @@ const Index = () => {
                   initialData={upscaleInitialData}
                   onInitialDataConsumed={clearUpscaleInitialData}
                   onLoad={() => markTabLoaded("upscale")}
+                />
+              </Suspense>
+            </TabsContent>
+
+            <TabsContent value="detector">
+              <Suspense fallback={<TabSkeleton />}>
+                <DetectorTab
+                  onLoad={() => markTabLoaded("detector")}
                 />
               </Suspense>
             </TabsContent>

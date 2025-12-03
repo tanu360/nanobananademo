@@ -26,6 +26,30 @@ export interface UpscaleParams {
   response_format?: "url" | "b64_json";
 }
 
+export interface SynthIDParams {
+  image?: string;
+  url?: string;
+}
+
+export interface SynthIDResponse {
+  isAIGenerated: boolean;
+  score: string;
+  reasoning: string;
+  error: boolean;
+  copyright: string;
+  timestamp: string;
+}
+
+export interface SynthIDErrorResponse {
+  error: {
+    message: string;
+    type: string;
+    param: string | null;
+    code: string;
+  };
+  copyright: string;
+}
+
 export interface ImageData {
   url?: string;
   b64_json?: string;
@@ -101,6 +125,26 @@ export async function upscaleImage(params: UpscaleParams): Promise<ImageResponse
   }
 
   return response.json();
+}
+
+export async function detectSynthID(params: SynthIDParams): Promise<SynthIDResponse> {
+  const response = await fetch("https://synthid.aikit.club/check", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "Authorization": `Bearer ${API_KEY}`,
+    },
+    body: JSON.stringify(params),
+  });
+
+  const data = await response.json();
+
+  // Check if it's an error response with nested error object
+  if (data.error && typeof data.error === "object" && data.error.message) {
+    throw new Error(data.error.message);
+  }
+
+  return data as SynthIDResponse;
 }
 
 export async function listModels(): Promise<ModelList> {
