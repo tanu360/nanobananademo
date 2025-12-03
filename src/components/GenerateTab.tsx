@@ -164,7 +164,7 @@ export function GenerateTab({ initialData, onInitialDataConsumed, onLoad }: Gene
       const downloadUrl = URL.createObjectURL(blob);
       const a = document.createElement("a");
       a.href = downloadUrl;
-      a.download = `nanobanana-${Date.now()}-${index}.png`;
+      a.download = `nanobanana-${Date.now()}-${index + 1}.png`;
       document.body.appendChild(a);
       a.click();
       document.body.removeChild(a);
