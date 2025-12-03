@@ -18,7 +18,7 @@ const MODELS = [
   { id: "nano-banana", name: "Nano Banana", description: "Default", maxImages: 1 },
   { id: "imagen-4.0-ultra-generate-001", name: "Imagen Ultra 4.0", description: "Best quality", maxImages: 4 },
   { id: "imagen-4.0-generate-001", name: "Imagen Pro 4.0", description: "High quality", maxImages: 4 },
-  { id: "imagen-4.0-fast-generate-001", name: "Imagen Fast 4.0", description: "Quick generation", maxImages: 4 },
+  { id: "imagen-4.0-fast-generate-001", name: "Imagen Fast 4.0", description: "Quick result", maxImages: 4 },
   { id: "imagen-3.0-generate-002", name: "Imagen 3.0 v2", description: "Stable", maxImages: 4 },
   { id: "imagen-3.0-generate-001", name: "Imagen 3.0 v1", description: "Classic", maxImages: 4 },
   { id: "imagen-3.0-fast-generate-001", name: "Imagen 3.0 Fast", description: "Quick", maxImages: 4 },
@@ -196,17 +196,16 @@ export function GenerateTab({ initialData, onInitialDataConsumed, onLoad }: Gene
           />
         </div>
 
-        <Collapsible open={advancedOpen} onOpenChange={setAdvancedOpen}>
+        <Collapsible open={advancedOpen} onOpenChange={setAdvancedOpen} className="rounded-lg border bg-card">
           <CollapsibleTrigger asChild>
-            <Button variant="ghost" className="flex w-full items-center justify-between px-0 hover:bg-transparent">
+            <Button variant="ghost" className="flex w-full items-center justify-between px-4 py-4 rounded-lg hover:bg-transparent">
               <span className="text-sm font-medium">Advanced Controls</span>
               <ChevronDown className={cn("h-4 w-4 transition-transform", advancedOpen && "rotate-180")} />
             </Button>
           </CollapsibleTrigger>
-          <CollapsibleContent className="space-y-6 pt-4">
-            {/* Model Selection */}
+          <CollapsibleContent className="space-y-6 px-4 pb-4">
             <div className="space-y-3">
-              <Label>Model</Label>
+              <Label className="text-muted-foreground">Model</Label>
               <OptionCard
                 selected={model === "nano-banana"}
                 onClick={() => setModel("nano-banana")}
@@ -237,7 +236,7 @@ export function GenerateTab({ initialData, onInitialDataConsumed, onLoad }: Gene
                   onClick={() => setModel("imagen-4.0-fast-generate-001")}
                 >
                   <span className="text-sm font-medium">Imagen Fast 4.0</span>
-                  <span className="text-xs text-muted-foreground">Quick generation</span>
+                  <span className="text-xs text-muted-foreground">Quick result</span>
                 </OptionCard>
               </div>
 
@@ -269,7 +268,7 @@ export function GenerateTab({ initialData, onInitialDataConsumed, onLoad }: Gene
 
             {/* Image Size */}
             <div className="space-y-3">
-              <Label>Image Size</Label>
+              <Label className="text-muted-foreground">Image Size</Label>
               <div className="grid grid-cols-2 gap-2">
                 {SIZES.map((s) => (
                   <OptionCard key={s.value} selected={size === s.value} onClick={() => setSize(s.value)}>
@@ -282,7 +281,7 @@ export function GenerateTab({ initialData, onInitialDataConsumed, onLoad }: Gene
 
             {/* Aspect Ratio */}
             <div className="space-y-3">
-              <Label>Aspect Ratio</Label>
+              <Label className="text-muted-foreground">Aspect Ratio</Label>
 
               {/* 1:1, 16:9, 9:16 in first row */}
               <div className="grid grid-cols-3 gap-2">
@@ -322,7 +321,7 @@ export function GenerateTab({ initialData, onInitialDataConsumed, onLoad }: Gene
 
             {/* Quality */}
             <div className="space-y-3">
-              <Label>Quality</Label>
+              <Label className="text-muted-foreground">Quality</Label>
               <div className="grid grid-cols-4 gap-2">
                 {QUALITY_OPTIONS.map((q) => (
                   <OptionCard key={q.value} selected={quality === q.value} onClick={() => setQuality(q.value)}>
@@ -334,7 +333,7 @@ export function GenerateTab({ initialData, onInitialDataConsumed, onLoad }: Gene
 
             {/* Count */}
             <div className="space-y-3">
-              <Label>Count {maxImages === 1 && <span className="text-xs text-muted-foreground">(max 1 for {currentModel?.name})</span>}</Label>
+              <Label className="text-muted-foreground">Count {maxImages === 1 && <span className="text-xs">(max 1 for {currentModel?.name})</span>}</Label>
               <div className="grid grid-cols-4 gap-2">
                 {[1, 2, 3, 4].map((n) => (
                   <OptionCard
@@ -351,7 +350,7 @@ export function GenerateTab({ initialData, onInitialDataConsumed, onLoad }: Gene
 
             {/* Negative Prompt */}
             <div className="space-y-2">
-              <Label htmlFor="negative">Negative Prompt</Label>
+              <Label htmlFor="negative" className="text-muted-foreground">Negative Prompt</Label>
               <Input
                 id="negative"
                 placeholder="blur, low quality, distortion..."
@@ -362,7 +361,7 @@ export function GenerateTab({ initialData, onInitialDataConsumed, onLoad }: Gene
 
             {/* Seed */}
             <div className="space-y-2">
-              <Label htmlFor="seed">Seed (optional) {enhancePrompt && <span className="text-xs text-muted-foreground">(disabled when Enhance Prompt is on)</span>}</Label>
+              <Label htmlFor="seed" className="text-muted-foreground">Seed (optional) {enhancePrompt && <span className="text-xs">(disabled when Enhance Prompt is on)</span>}</Label>
               <Input
                 id="seed"
                 type="number"
@@ -386,7 +385,7 @@ export function GenerateTab({ initialData, onInitialDataConsumed, onLoad }: Gene
             {/* Enhance Prompt */}
             <div className={cn("flex items-center justify-between rounded-md border p-4", model === "imagen-4.0-fast-generate-001" && "opacity-50")}>
               <div className="space-y-0.5">
-                <Label>Enhance Prompt</Label>
+                <Label className="text-muted-foreground">Enhance Prompt</Label>
                 <p className="text-xs text-muted-foreground">
                   {model === "imagen-4.0-fast-generate-001" ? "Not supported for Imagen Fast 4.0" : "Use AI to improve your prompt"}
                 </p>
