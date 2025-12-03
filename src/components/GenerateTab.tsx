@@ -16,7 +16,7 @@ import { saveToHistory } from "@/lib/imageHistory";
 
 const MODELS = [
   { id: "nano-banana", name: "Nano Banana", description: "Default", maxImages: 1 },
-  { id: "imagen-4.0-ultra-generate-001", name: "Imagen Ultra 4.0", description: "Highest quality", maxImages: 4 },
+  { id: "imagen-4.0-ultra-generate-001", name: "Imagen Ultra 4.0", description: "Best quality", maxImages: 4 },
   { id: "imagen-4.0-generate-001", name: "Imagen Pro 4.0", description: "High quality", maxImages: 4 },
   { id: "imagen-4.0-fast-generate-001", name: "Imagen Fast 4.0", description: "Quick generation", maxImages: 4 },
   { id: "imagen-3.0-generate-002", name: "Imagen 3.0 v2", description: "Stable", maxImages: 4 },
@@ -32,16 +32,8 @@ const SIZES = [
 const QUALITY_OPTIONS = [
   { value: "auto", label: "Auto" },
   { value: "low", label: "Low" },
-  { value: "medium", label: "Mid" },
   { value: "high", label: "High" },
   { value: "hd", label: "HD" },
-];
-
-const LANDSCAPE_RATIOS = [
-  { value: "21:9", label: "21:9", description: "Ultra" },
-  { value: "16:9", label: "16:9", description: "Wide" },
-  { value: "4:3", label: "4:3", description: "Standard" },
-  { value: "3:2", label: "3:2", description: "Classic" },
 ];
 
 const SQUARE_RATIOS = [
@@ -52,22 +44,6 @@ interface GenerateTabProps {
   initialData?: { prompt: string; model: string } | null;
   onInitialDataConsumed?: () => void;
   onLoad?: () => void;
-}
-
-const FLEXIBLE_RATIOS = [
-  { value: "5:4", label: "5:4", description: "Wide" },
-  { value: "4:5", label: "4:5", description: "Tall" },
-];
-
-const PORTRAIT_RATIOS = [
-  { value: "2:3", label: "2:3", description: "Classic" },
-  { value: "3:4", label: "3:4", description: "Portrait" },
-  { value: "9:16", label: "9:16", description: "Tall" },
-];
-
-interface GenerateTabProps {
-  initialData?: { prompt: string; model: string } | null;
-  onInitialDataConsumed?: () => void;
 }
 
 export function GenerateTab({ initialData, onInitialDataConsumed, onLoad }: GenerateTabProps) {
@@ -109,6 +85,13 @@ export function GenerateTab({ initialData, onInitialDataConsumed, onLoad }: Gene
       setCount(maxImages);
     }
   }, [model, maxImages, count]);
+
+  // Disable enhancePrompt for imagen-4.0-fast model
+  useEffect(() => {
+    if (model === "imagen-4.0-fast-generate-001") {
+      setEnhancePrompt(false);
+    }
+  }, [model]);
 
   useEffect(() => {
     setCurrentImageIndex(0);
@@ -233,13 +216,14 @@ export function GenerateTab({ initialData, onInitialDataConsumed, onLoad }: Gene
                 <span className="text-xs text-muted-foreground">Default</span>
               </OptionCard>
 
-              <div className="grid grid-cols-2 gap-2">
+              {/* Imagen 4.0 models - 3 in one row */}
+              <div className="grid grid-cols-3 gap-2">
                 <OptionCard
                   selected={model === "imagen-4.0-ultra-generate-001"}
                   onClick={() => setModel("imagen-4.0-ultra-generate-001")}
                 >
                   <span className="text-sm font-medium">Imagen Ultra 4.0</span>
-                  <span className="text-xs text-muted-foreground">Highest quality</span>
+                  <span className="text-xs text-muted-foreground">Best quality</span>
                 </OptionCard>
                 <OptionCard
                   selected={model === "imagen-4.0-generate-001"}
@@ -248,9 +232,6 @@ export function GenerateTab({ initialData, onInitialDataConsumed, onLoad }: Gene
                   <span className="text-sm font-medium">Imagen Pro 4.0</span>
                   <span className="text-xs text-muted-foreground">High quality</span>
                 </OptionCard>
-              </div>
-
-              <div className="grid grid-cols-2 gap-2">
                 <OptionCard
                   selected={model === "imagen-4.0-fast-generate-001"}
                   onClick={() => setModel("imagen-4.0-fast-generate-001")}
@@ -258,6 +239,10 @@ export function GenerateTab({ initialData, onInitialDataConsumed, onLoad }: Gene
                   <span className="text-sm font-medium">Imagen Fast 4.0</span>
                   <span className="text-xs text-muted-foreground">Quick generation</span>
                 </OptionCard>
+              </div>
+
+              {/* Imagen 3.0 models - 3 in one row */}
+              <div className="grid grid-cols-3 gap-2">
                 <OptionCard
                   selected={model === "imagen-3.0-generate-002"}
                   onClick={() => setModel("imagen-3.0-generate-002")}
@@ -265,9 +250,6 @@ export function GenerateTab({ initialData, onInitialDataConsumed, onLoad }: Gene
                   <span className="text-sm font-medium">Imagen 3.0 v2</span>
                   <span className="text-xs text-muted-foreground">Stable</span>
                 </OptionCard>
-              </div>
-
-              <div className="grid grid-cols-2 gap-2">
                 <OptionCard
                   selected={model === "imagen-3.0-generate-001"}
                   onClick={() => setModel("imagen-3.0-generate-001")}
@@ -302,65 +284,46 @@ export function GenerateTab({ initialData, onInitialDataConsumed, onLoad }: Gene
             <div className="space-y-3">
               <Label>Aspect Ratio</Label>
 
-              <div className="space-y-2">
-                <span className="text-xs uppercase tracking-wide text-muted-foreground">Landscape</span>
-                <div className="grid grid-cols-4 gap-2">
-                  {LANDSCAPE_RATIOS.map((r) => (
-                    <OptionCard key={r.value} selected={aspectRatio === r.value} onClick={() => setAspectRatio(r.value)}>
-                      <AspectRatioIcon ratio={r.value} className="mb-1" />
-                      <span className="text-sm font-bold">{r.label}</span>
-                      <span className="text-xs text-muted-foreground">{r.description}</span>
-                    </OptionCard>
-                  ))}
-                </div>
+              {/* 1:1, 16:9, 9:16 in first row */}
+              <div className="grid grid-cols-3 gap-2">
+                {SQUARE_RATIOS.map((r) => (
+                  <OptionCard key={r.value} selected={aspectRatio === r.value} onClick={() => setAspectRatio(r.value)}>
+                    <AspectRatioIcon ratio={r.value} className="mb-1" />
+                    <span className="text-sm font-bold">{r.label}</span>
+                    <span className="text-xs text-muted-foreground">{r.description}</span>
+                  </OptionCard>
+                ))}
+                <OptionCard selected={aspectRatio === "16:9"} onClick={() => setAspectRatio("16:9")}>
+                  <AspectRatioIcon ratio="16:9" className="mb-1" />
+                  <span className="text-sm font-bold">16:9</span>
+                  <span className="text-xs text-muted-foreground">Wide</span>
+                </OptionCard>
+                <OptionCard selected={aspectRatio === "9:16"} onClick={() => setAspectRatio("9:16")}>
+                  <AspectRatioIcon ratio="9:16" className="mb-1" />
+                  <span className="text-sm font-bold">9:16</span>
+                  <span className="text-xs text-muted-foreground">Tall</span>
+                </OptionCard>
               </div>
 
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <span className="text-xs uppercase tracking-wide text-muted-foreground">Square</span>
-                  <div className="grid grid-cols-1 gap-2">
-                    {SQUARE_RATIOS.map((r) => (
-                      <OptionCard key={r.value} selected={aspectRatio === r.value} onClick={() => setAspectRatio(r.value)}>
-                        <AspectRatioIcon ratio={r.value} className="mb-1" />
-                        <span className="text-sm font-bold">{r.label}</span>
-                        <span className="text-xs text-muted-foreground">{r.description}</span>
-                      </OptionCard>
-                    ))}
-                  </div>
-                </div>
-
-                <div className="space-y-2">
-                  <span className="text-xs uppercase tracking-wide text-muted-foreground">Flexible</span>
-                  <div className="grid grid-cols-2 gap-2">
-                    {FLEXIBLE_RATIOS.map((r) => (
-                      <OptionCard key={r.value} selected={aspectRatio === r.value} onClick={() => setAspectRatio(r.value)}>
-                        <AspectRatioIcon ratio={r.value} className="mb-1" />
-                        <span className="text-sm font-bold">{r.label}</span>
-                        <span className="text-xs text-muted-foreground">{r.description}</span>
-                      </OptionCard>
-                    ))}
-                  </div>
-                </div>
-              </div>
-
-              <div className="space-y-2">
-                <span className="text-xs uppercase tracking-wide text-muted-foreground">Portrait</span>
-                <div className="grid grid-cols-3 gap-2">
-                  {PORTRAIT_RATIOS.map((r) => (
-                    <OptionCard key={r.value} selected={aspectRatio === r.value} onClick={() => setAspectRatio(r.value)}>
-                      <AspectRatioIcon ratio={r.value} className="mb-1" />
-                      <span className="text-sm font-bold">{r.label}</span>
-                      <span className="text-xs text-muted-foreground">{r.description}</span>
-                    </OptionCard>
-                  ))}
-                </div>
+              {/* 4:3, 3:4 in second row */}
+              <div className="grid grid-cols-2 gap-2">
+                <OptionCard selected={aspectRatio === "4:3"} onClick={() => setAspectRatio("4:3")}>
+                  <AspectRatioIcon ratio="4:3" className="mb-1" />
+                  <span className="text-sm font-bold">4:3</span>
+                  <span className="text-xs text-muted-foreground">Standard</span>
+                </OptionCard>
+                <OptionCard selected={aspectRatio === "3:4"} onClick={() => setAspectRatio("3:4")}>
+                  <AspectRatioIcon ratio="3:4" className="mb-1" />
+                  <span className="text-sm font-bold">3:4</span>
+                  <span className="text-xs text-muted-foreground">Portrait</span>
+                </OptionCard>
               </div>
             </div>
 
             {/* Quality */}
             <div className="space-y-3">
               <Label>Quality</Label>
-              <div className="grid grid-cols-5 gap-2">
+              <div className="grid grid-cols-4 gap-2">
                 {QUALITY_OPTIONS.map((q) => (
                   <OptionCard key={q.value} selected={quality === q.value} onClick={() => setQuality(q.value)}>
                     <span className="text-sm font-medium">{q.label}</span>
@@ -399,23 +362,31 @@ export function GenerateTab({ initialData, onInitialDataConsumed, onLoad }: Gene
 
             {/* Seed */}
             <div className="space-y-2">
-              <Label htmlFor="seed">Seed (optional)</Label>
+              <Label htmlFor="seed">Seed (optional) {enhancePrompt && <span className="text-xs text-muted-foreground">(disabled when Enhance Prompt is on)</span>}</Label>
               <Input
                 id="seed"
                 type="number"
-                placeholder="Random seed for reproducible results"
+                placeholder={enhancePrompt ? "Disabled with Enhance Prompt" : "Random seed for reproducible results"}
                 value={seed}
                 onChange={(e) => setSeed(e.target.value)}
+                disabled={enhancePrompt}
+                className={enhancePrompt ? "opacity-50 cursor-not-allowed" : ""}
               />
             </div>
 
             {/* Enhance Prompt */}
-            <div className="flex items-center justify-between rounded-md border p-4">
+            <div className={cn("flex items-center justify-between rounded-md border p-4", model === "imagen-4.0-fast-generate-001" && "opacity-50")}>
               <div className="space-y-0.5">
                 <Label>Enhance Prompt</Label>
-                <p className="text-xs text-muted-foreground">Use AI to improve your prompt</p>
+                <p className="text-xs text-muted-foreground">
+                  {model === "imagen-4.0-fast-generate-001" ? "Not supported for Imagen Fast 4.0" : "Use AI to improve your prompt"}
+                </p>
               </div>
-              <Switch checked={enhancePrompt} onCheckedChange={setEnhancePrompt} />
+              <Switch
+                checked={enhancePrompt}
+                onCheckedChange={setEnhancePrompt}
+                disabled={model === "imagen-4.0-fast-generate-001"}
+              />
             </div>
           </CollapsibleContent>
         </Collapsible>
