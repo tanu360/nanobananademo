@@ -18,7 +18,6 @@ const ALLOWED_TYPES = ["image/jpeg", "image/png", "image/gif", "image/webp"];
 
 const UPSCALE_FACTORS = [
   { value: "x2", label: "2x", description: "2K Resolution" },
-  { value: "x3", label: "3x", description: "3K Resolution" },
   { value: "x4", label: "4x", description: "4K Resolution" },
 ];
 
@@ -33,7 +32,7 @@ export function UpscaleTab({ initialData, onInitialDataConsumed, onLoad }: Upsca
   const [uploadedImage, setUploadedImage] = useState<string | null>(null);
   const [uploadedFileInfo, setUploadedFileInfo] = useState<{ name: string; size: string } | null>(null);
   const [imageSource, setImageSource] = useState<"url" | "upload">("url");
-  const [upscaleFactor, setUpscaleFactor] = useState<"x2" | "x3" | "x4">("x2");
+  const [upscaleFactor, setUpscaleFactor] = useState<"x2" | "x4">("x2");
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<ImageData | null>(null);
   const [isDragging, setIsDragging] = useState(false);
@@ -264,12 +263,12 @@ export function UpscaleTab({ initialData, onInitialDataConsumed, onLoad }: Upsca
 
         <div className="space-y-3">
           <Label>Upscale Factor</Label>
-          <div className="grid grid-cols-3 gap-2">
+          <div className="grid grid-cols-2 gap-2">
             {UPSCALE_FACTORS.map((f) => (
               <OptionCard
                 key={f.value}
                 selected={upscaleFactor === f.value}
-                onClick={() => setUpscaleFactor(f.value as "x2" | "x3" | "x4")}
+                onClick={() => setUpscaleFactor(f.value as "x2" | "x4")}
               >
                 <span className="text-sm font-bold">{f.label}</span>
                 <span className="text-xs text-muted-foreground">{f.description}</span>

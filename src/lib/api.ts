@@ -8,9 +8,6 @@ export interface GenerateParams {
   size?: string;
   sampleImageSize?: "1K" | "2K";
   quality?: string;
-  enhance_prompt?: boolean;
-  negative_prompt?: string;
-  seed?: number;
   response_format?: "url" | "b64_json";
 }
 
@@ -22,7 +19,7 @@ export interface EditParams {
 
 export interface UpscaleParams {
   image: string;
-  upscale_factor?: "x2" | "x3" | "x4";
+  upscale_factor?: "x2" | "x4";
   response_format?: "url" | "b64_json";
 }
 
@@ -167,9 +164,6 @@ export const MODELS = [
   { id: "imagen-4.0-ultra-generate-001", name: "Imagen 4.0 Ultra", description: "Highest quality" },
   { id: "imagen-4.0-generate-001", name: "Imagen 4.0", description: "High quality" },
   { id: "imagen-4.0-fast-generate-001", name: "Imagen 4.0 Fast", description: "Fast generation" },
-  { id: "imagen-3.0-generate-002", name: "Imagen 3.0 v2", description: "Stable quality" },
-  { id: "imagen-3.0-generate-001", name: "Imagen 3.0 v1", description: "Classic model" },
-  { id: "imagen-3.0-fast-generate-001", name: "Imagen 3.0 Fast", description: "Quick results" },
 ];
 
 export const SIZES = [
@@ -197,6 +191,5 @@ export const QUALITY_OPTIONS = [
 
 export const UPSCALE_FACTORS = [
   { value: "x2", label: "2x" },
-  { value: "x3", label: "3x" },
   { value: "x4", label: "4x" },
 ];

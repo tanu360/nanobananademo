@@ -1,9 +1,7 @@
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { Switch } from "@/components/ui/switch";
 import { Card, CardContent } from "@/components/ui/card";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { Loader2, Sparkles, Download, ChevronDown, ChevronLeft, ChevronRight } from "lucide-react";
@@ -19,9 +17,6 @@ const MODELS = [
   { id: "imagen-4.0-ultra-generate-001", name: "Imagen Ultra 4.0", description: "Best quality", maxImages: 4 },
   { id: "imagen-4.0-generate-001", name: "Imagen Pro 4.0", description: "High quality", maxImages: 4 },
   { id: "imagen-4.0-fast-generate-001", name: "Imagen Fast 4.0", description: "Quick result", maxImages: 4 },
-  { id: "imagen-3.0-generate-002", name: "Imagen 3.0 v2", description: "Stable", maxImages: 4 },
-  { id: "imagen-3.0-generate-001", name: "Imagen 3.0 v1", description: "Classic", maxImages: 4 },
-  { id: "imagen-3.0-fast-generate-001", name: "Imagen 3.0 Fast", description: "Quick", maxImages: 4 },
 ];
 
 const SIZES = [
@@ -48,14 +43,11 @@ interface GenerateTabProps {
 
 export function GenerateTab({ initialData, onInitialDataConsumed, onLoad }: GenerateTabProps) {
   const [prompt, setPrompt] = useState("");
-  const [negativePrompt, setNegativePrompt] = useState("");
   const [model, setModel] = useState("nano-banana");
   const [size, setSize] = useState("1K");
   const [quality, setQuality] = useState("auto");
   const [aspectRatio, setAspectRatio] = useState("1:1");
-  const [enhancePrompt, setEnhancePrompt] = useState(true);
   const [count, setCount] = useState(1);
-  const [seed, setSeed] = useState("");
   const [loading, setLoading] = useState(false);
   const [results, setResults] = useState<ImageData[]>([]);
   const [advancedOpen, setAdvancedOpen] = useState(false);
@@ -86,13 +78,6 @@ export function GenerateTab({ initialData, onInitialDataConsumed, onLoad }: Gene
     }
   }, [model, maxImages, count]);
 
-  // Disable enhancePrompt for imagen-4.0-fast model
-  useEffect(() => {
-    if (model === "imagen-4.0-fast-generate-001") {
-      setEnhancePrompt(false);
-    }
-  }, [model]);
-
   useEffect(() => {
     setCurrentImageIndex(0);
   }, [results]);
@@ -114,18 +99,9 @@ export function GenerateTab({ initialData, onInitialDataConsumed, onLoad }: Gene
         size: aspectRatio,
         sampleImageSize: size as "1K" | "2K",
         quality,
-        enhance_prompt: enhancePrompt,
         n: count,
         response_format: "url",
       };
-
-      if (negativePrompt.trim()) {
-        params.negative_prompt = negativePrompt;
-      }
-
-      if (seed.trim()) {
-        params.seed = parseInt(seed);
-      }
 
       const response = await generateImage(params);
       setResults(response.data);
@@ -245,31 +221,6 @@ export function GenerateTab({ initialData, onInitialDataConsumed, onLoad }: Gene
                   <span className="text-xs text-muted-foreground">Quick result</span>
                 </OptionCard>
               </div>
-
-              {/* Imagen 3.0 models - 3 in one row */}
-              <div className="grid grid-cols-3 gap-2">
-                <OptionCard
-                  selected={model === "imagen-3.0-generate-002"}
-                  onClick={() => setModel("imagen-3.0-generate-002")}
-                >
-                  <span className="text-sm font-medium">Imagen 3.0 v2</span>
-                  <span className="text-xs text-muted-foreground">Stable</span>
-                </OptionCard>
-                <OptionCard
-                  selected={model === "imagen-3.0-generate-001"}
-                  onClick={() => setModel("imagen-3.0-generate-001")}
-                >
-                  <span className="text-sm font-medium">Imagen 3.0 v1</span>
-                  <span className="text-xs text-muted-foreground">Classic</span>
-                </OptionCard>
-                <OptionCard
-                  selected={model === "imagen-3.0-fast-generate-001"}
-                  onClick={() => setModel("imagen-3.0-fast-generate-001")}
-                >
-                  <span className="text-sm font-medium">Imagen 3.0 Fast</span>
-                  <span className="text-xs text-muted-foreground">Quick</span>
-                </OptionCard>
-              </div>
             </div>
 
             {/* Image Size */}
@@ -352,61 +303,6 @@ export function GenerateTab({ initialData, onInitialDataConsumed, onLoad }: Gene
                   </OptionCard>
                 ))}
               </div>
-            </div>
-
-            {/* Negative Prompt */}
-            <div className="space-y-2">
-              <div className="flex items-center justify-between">
-                <Label htmlFor="negative" className="text-muted-foreground">Negative Prompt</Label>
-                <span className="text-xs text-muted-foreground">
-                  {negativePrompt.length} / 1024
-                </span>
-              </div>
-              <Input
-                id="negative"
-                placeholder="blur, low quality, distortion..."
-                value={negativePrompt}
-                onChange={(e) => setNegativePrompt(e.target.value)}
-                maxLength={1024}
-              />
-            </div>
-
-            {/* Seed */}
-            <div className="space-y-2">
-              <Label htmlFor="seed" className="text-muted-foreground">Seed (optional) {enhancePrompt && <span className="text-xs">(disabled when Enhance Prompt is on)</span>}</Label>
-              <Input
-                id="seed"
-                type="number"
-                min="0"
-                max="2147483647"
-                placeholder={enhancePrompt ? "Disabled with Enhance Prompt" : "Random seed for reproducible results"}
-                value={seed}
-                onChange={(e) => {
-                  const value = e.target.value;
-                  const numValue = parseInt(value);
-                  // Only allow positive numbers within range
-                  if (value === "" || (numValue >= 0 && numValue <= 2147483647)) {
-                    setSeed(value);
-                  }
-                }}
-                disabled={enhancePrompt}
-                className={enhancePrompt ? "opacity-50 cursor-not-allowed" : ""}
-              />
-            </div>
-
-            {/* Enhance Prompt */}
-            <div className={cn("flex items-center justify-between rounded-md border p-4", model === "imagen-4.0-fast-generate-001" && "opacity-50")}>
-              <div className="space-y-0.5">
-                <Label className="text-muted-foreground">Enhance Prompt</Label>
-                <p className="text-xs text-muted-foreground">
-                  {model === "imagen-4.0-fast-generate-001" ? "Not supported for Imagen Fast 4.0" : "Use AI to improve your prompt"}
-                </p>
-              </div>
-              <Switch
-                checked={enhancePrompt}
-                onCheckedChange={setEnhancePrompt}
-                disabled={model === "imagen-4.0-fast-generate-001"}
-              />
             </div>
           </CollapsibleContent>
         </Collapsible>

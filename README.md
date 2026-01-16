@@ -14,9 +14,6 @@ Create stunning images from text prompts using state-of-the-art AI models.
 - Resolution options: 1K, 2K
 - Quality presets: Auto, Low, High, HD
 - Batch generation: up to 4 images at once
-- Negative prompts for fine control
-- Seed support for reproducibility
-- Prompt enhancement with AI
 
 ### ✏️ Edit
 
@@ -31,7 +28,7 @@ Modify existing images using natural language instructions.
 
 Enhance image resolution up to 4x.
 
-- Upscale factors: 2x, 3x, 4x
+- Upscale factors: 2x, 4x
 - Supports URL or file upload
 - Uses Google's `imagen-4.0-upscale-preview`
 
@@ -43,10 +40,7 @@ Enhance image resolution up to 4x.
 | `imagen-4.0-ultra-generate-001` | Google             | Generate      | Highest quality, max 4 |
 | `imagen-4.0-generate-001`       | Google             | Generate      | High quality, max 4    |
 | `imagen-4.0-fast-generate-001`  | Google             | Generate      | Fast, max 4            |
-| `imagen-3.0-generate-002`       | Google             | Generate      | Stable, max 4          |
-| `imagen-3.0-generate-001`       | Google             | Generate      | Classic, max 4         |
-| `imagen-3.0-fast-generate-001`  | Google             | Generate      | Quick, max 4           |
-| `imagen-4.0-upscale-preview`    | Google             | Upscale       | 2x/3x/4x               |
+| `imagen-4.0-upscale-preview`    | Google             | Upscale       | 2x/4x                  |
 
 ## API
 

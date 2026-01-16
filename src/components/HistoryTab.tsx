@@ -138,9 +138,6 @@ export function HistoryTab({ onRegenerate, onEdit, onUpscale, onLoad }: HistoryT
          if (model.includes("ultra")) return "Imagen Ultra 4.0";
          if (model.includes("4.0-generate")) return "Imagen Pro 4.0";
          if (model.includes("4.0-fast")) return "Imagen Fast 4.0";
-         if (model.includes("3.0-generate-002")) return "Imagen 3.0 v2";
-         if (model.includes("3.0-generate-001")) return "Imagen 3.0 v1";
-         if (model.includes("3.0-fast")) return "Imagen 3.0 Fast";
          return model;
       }
       return null;
