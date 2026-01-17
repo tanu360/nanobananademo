@@ -1,5 +1,5 @@
 import { useState, useRef, useCallback, useEffect } from "react";
-import { ReactCompareSlider, ReactCompareSliderImage } from "react-compare-slider";
+import { ReactCompareSlider, ReactCompareSliderImage, ReactCompareSliderHandle } from "react-compare-slider";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -302,6 +302,20 @@ export function UpscaleTab({ initialData, onInitialDataConsumed, onLoad }: Upsca
               <ReactCompareSlider
                 itemOne={<ReactCompareSliderImage src={previewImage} alt="Original" />}
                 itemTwo={<ReactCompareSliderImage src={resultImage} alt="Upscaled" />}
+                handle={
+                  <ReactCompareSliderHandle
+                    buttonStyle={{
+                      backgroundColor: 'white',
+                      border: '2px solid #e5e7eb',
+                      boxShadow: '0 2px 8px rgba(0,0,0,0.15)',
+                      color: '#374151',
+                    }}
+                    linesStyle={{
+                      backgroundColor: 'white',
+                      boxShadow: '0 0 4px rgba(0,0,0,0.2)',
+                    }}
+                  />
+                }
               />
               <Button
                 size="icon"
