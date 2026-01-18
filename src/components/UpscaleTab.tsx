@@ -16,6 +16,35 @@ import { cn } from "@/lib/utils";
 const MAX_FILE_SIZE = 16 * 1024 * 1024; // 16MB
 const ALLOWED_TYPES = ["image/jpeg", "image/png", "image/gif", "image/webp"];
 
+// Convert image to JPG using canvas
+async function convertImageToJpg(src: string): Promise<string> {
+  return new Promise((resolve, reject) => {
+    const img = new Image();
+    img.crossOrigin = "anonymous";
+    img.onload = () => {
+      const canvas = document.createElement("canvas");
+      canvas.width = img.width;
+      canvas.height = img.height;
+      const ctx = canvas.getContext("2d");
+      if (!ctx) {
+        reject(new Error("Failed to get canvas context"));
+        return;
+      }
+      ctx.drawImage(img, 0, 0);
+      resolve(canvas.toDataURL("image/jpeg", 1));
+    };
+    img.onerror = () => reject(new Error("Failed to load image"));
+    img.src = src;
+  });
+}
+
+// Check if image is WebP (by URL extension or data URL mime type)
+function isWebpImage(src: string): boolean {
+  if (src.startsWith("data:image/webp")) return true;
+  const url = src.toLowerCase();
+  return url.includes(".webp") || url.includes("format=webp") || url.includes("f=webp");
+}
+
 const UPSCALE_FACTORS = [
   { value: "x2", label: "2x", description: "2K Resolution" },
   { value: "x4", label: "4x", description: "4K Resolution" },
@@ -86,7 +115,7 @@ export function UpscaleTab({ initialData, onInitialDataConsumed, onLoad }: Upsca
   };
 
   const handleUpscale = async () => {
-    const imageToUpscale = imageSource === "url" ? imageUrl : uploadedImage;
+    let imageToUpscale = imageSource === "url" ? imageUrl : uploadedImage;
     if (!imageToUpscale) {
       toast({ title: "Please provide an image", variant: "destructive" });
       return;
@@ -94,6 +123,11 @@ export function UpscaleTab({ initialData, onInitialDataConsumed, onLoad }: Upsca
 
     setLoading(true);
     try {
+      // Convert WebP to JPG (WebP not supported for full quality upscale)
+      if (isWebpImage(imageToUpscale)) {
+        imageToUpscale = await convertImageToJpg(imageToUpscale);
+      }
+
       const response = await upscaleImage({
         image: imageToUpscale,
         upscale_factor: upscaleFactor,
