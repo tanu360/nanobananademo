@@ -6,7 +6,6 @@ export interface GenerateParams {
   model?: string;
   n?: number;
   size?: string;
-  sampleImageSize?: "1K" | "2K";
   quality?: string;
   response_format?: "url" | "b64_json";
 }

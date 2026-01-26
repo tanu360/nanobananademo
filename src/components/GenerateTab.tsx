@@ -19,11 +19,6 @@ const MODELS = [
   { id: "imagen-4.0-fast-generate-001", name: "Imagen Fast 4.0", description: "Quick result", maxImages: 4 },
 ];
 
-const SIZES = [
-  { value: "1K", label: "1K", description: "1024px" },
-  { value: "2K", label: "2K", description: "2048px" },
-];
-
 const QUALITY_OPTIONS = [
   { value: "auto", label: "Auto" },
   { value: "low", label: "Low" },
@@ -44,7 +39,6 @@ interface GenerateTabProps {
 export function GenerateTab({ initialData, onInitialDataConsumed, onLoad }: GenerateTabProps) {
   const [prompt, setPrompt] = useState("");
   const [model, setModel] = useState("nano-banana");
-  const [size, setSize] = useState("1K");
   const [quality, setQuality] = useState("auto");
   const [aspectRatio, setAspectRatio] = useState("1:1");
   const [count, setCount] = useState(1);
@@ -97,7 +91,6 @@ export function GenerateTab({ initialData, onInitialDataConsumed, onLoad }: Gene
         prompt,
         model,
         size: aspectRatio,
-        sampleImageSize: size as "1K" | "2K",
         quality,
         n: count,
         response_format: "url",
@@ -117,7 +110,7 @@ export function GenerateTab({ initialData, onInitialDataConsumed, onLoad }: Gene
         if (img.url) {
           // Use revised_prompt from API response, fallback to user prompt
           const displayPrompt = img.revised_prompt || prompt;
-          saveToHistory("generate", img.url, displayPrompt, { model, size, quality, aspectRatio });
+          saveToHistory("generate", img.url, displayPrompt, { model, quality, aspectRatio });
         }
       }
 
@@ -220,19 +213,6 @@ export function GenerateTab({ initialData, onInitialDataConsumed, onLoad }: Gene
                   <span className="text-sm font-medium">Imagen Fast 4.0</span>
                   <span className="text-xs text-muted-foreground">Quick result</span>
                 </OptionCard>
-              </div>
-            </div>
-
-            {/* Image Size */}
-            <div className="space-y-3">
-              <Label className="text-muted-foreground">Image Size</Label>
-              <div className="grid grid-cols-2 gap-2">
-                {SIZES.map((s) => (
-                  <OptionCard key={s.value} selected={size === s.value} onClick={() => setSize(s.value)}>
-                    <span className="text-sm font-bold">{s.label}</span>
-                    <span className="text-xs text-muted-foreground">{s.description}</span>
-                  </OptionCard>
-                ))}
               </div>
             </div>
 
