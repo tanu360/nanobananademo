@@ -14,7 +14,8 @@ import { saveToHistory } from "@/lib/imageHistory";
 
 const MODELS = [
   { id: "nano-banana", name: "Nano Banana", description: "Default", maxImages: 1 },
-{ id: "imagen-4.0-generate-001", name: "Imagen Pro 4.0", description: "High quality", maxImages: 4 },
+  { id: "imagen-4.0-ultra-generate-001", name: "Imagen Ultra 4.0", description: "Best quality", maxImages: 4 },
+  { id: "imagen-4.0-generate-001", name: "Imagen Pro 4.0", description: "High quality", maxImages: 4 },
   { id: "imagen-4.0-fast-generate-001", name: "Imagen Fast 4.0", description: "Quick result", maxImages: 4 },
 ];
 
@@ -190,7 +191,14 @@ export function GenerateTab({ initialData, onInitialDataConsumed, onLoad }: Gene
               </OptionCard>
 
               {/* Imagen 4.0 models - 3 in one row */}
-              <div className="grid grid-cols-2 gap-2">
+              <div className="grid grid-cols-3 gap-2">
+                <OptionCard
+                  selected={model === "imagen-4.0-ultra-generate-001"}
+                  onClick={() => setModel("imagen-4.0-ultra-generate-001")}
+                >
+                  <span className="text-sm font-medium">Imagen Ultra 4.0</span>
+                  <span className="text-xs text-muted-foreground">Best quality</span>
+                </OptionCard>
                 <OptionCard
                   selected={model === "imagen-4.0-generate-001"}
                   onClick={() => setModel("imagen-4.0-generate-001")}

@@ -135,7 +135,8 @@ export function HistoryTab({ onRegenerate, onEdit, onUpscale, onLoad }: HistoryT
          if (model === "nano-banana") return "Nano Banana";
          if (model === "nano-banana-editor") return "Nano Banana Editor";
          if (model === "nano-banana-upscaler") return "Nano Banana Upscaler";
-if (model.includes("4.0-generate")) return "Imagen Pro 4.0";
+         if (model.includes("ultra")) return "Imagen Ultra 4.0";
+         if (model.includes("4.0-generate")) return "Imagen Pro 4.0";
          if (model.includes("4.0-fast")) return "Imagen Fast 4.0";
          return model;
       }

@@ -160,7 +160,8 @@ export async function listModels(): Promise<ModelList> {
 
 export const MODELS = [
   { id: "nano-banana", name: "Nano Banana", description: "Default model" },
-{ id: "imagen-4.0-generate-001", name: "Imagen 4.0", description: "High quality" },
+  { id: "imagen-4.0-ultra-generate-001", name: "Imagen 4.0 Ultra", description: "Highest quality" },
+  { id: "imagen-4.0-generate-001", name: "Imagen 4.0", description: "High quality" },
   { id: "imagen-4.0-fast-generate-001", name: "Imagen 4.0 Fast", description: "Fast generation" },
 ];
 
