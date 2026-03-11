@@ -1,71 +1,81 @@
-# NanoBanana Demo
+<div align="center">
+  <img src="public/icon-512.png" alt="Nano Banana Logo" width="120" height="120">
+
+  <h1>🍌 NanoBanana Demo</h1>
+
+  <p>
+    <strong>A React playground for AI image generation, editing, and upscaling with Nano Banana and Google Imagen models</strong>
+  </p>
+
+  <p>
+    <a href="#-overview">Overview</a> •
+    <a href="#-openapi-docs">OpenAPI Docs</a> •
+    <a href="#-key-features">Features</a> •
+    <a href="#-supported-models">Models</a> •
+    <a href="#-supported-endpoints">Endpoints</a> •
+    <a href="#-quick-start">Quick Start</a> •
+    <a href="#-usage-examples">Usage Examples</a>
+  </p>
+
+  <br/>
+</div>
 
 ![NanoBanana Preview](public/og-image.webp)
 
-AI Image Playground — generate, edit, and upscale images with AI.
+## 🌟 Overview
 
-## Features
+NanoBanana Demo is an AI image playground built around the Nano Banana API. It gives you a clean web interface for generating, editing, and upscaling images while exposing OpenAI-compatible image endpoints for direct API usage.
 
-### 🎨 Generate
+It is designed for fast experimentation with `nano-banana` and Google Imagen models, with support for prompt-driven workflows, multiple aspect ratios, quality presets, and downloadable results.
 
-Create stunning images from text prompts using state-of-the-art AI models.
+## 📘 OpenAPI Docs
 
-- Multiple aspect ratios: 1:1, 16:9, 9:16, 4:3, 3:4, and more
-- Resolution options: 1K, 2K
-- Quality presets: Auto, Low, High, HD
-- Batch generation: up to 4 images at once
+### API documentation: https://nano-banana-api.readme.io/
 
-### ✏️ Edit
+- **Spec file**: `nano.json` (OpenAPI 3.0.0)
+- **What it is**: OpenAI-compatible API documentation covering image generation, edits, upscaling, available models, request formats, and example responses
+- **How to use**:
+  - Import `nano.json` into Swagger UI, Redocly, Postman, Bruno, or Insomnia
+  - Generate typed clients with tools like `openapi-generator` or `orval`
+- **Server**: Defaults to `https://nanobanana.aikit.club`
 
-Modify existing images using natural language instructions.
+## 🚀 Key Features
 
-- Upload images or provide URLs
-- AI-powered editing with text prompts
-- Before/after comparison view
-- Uses `nano-banana` model
+| Feature | Description |
+| ------- | ----------- |
+| 🍌 **AI Image Playground** | Generate, edit, and upscale images from one interface |
+| 🎨 **Text-to-Image** | Create images from prompts with Nano Banana and Imagen 4 models |
+| ✏️ **Prompt-Based Editing** | Modify existing images with natural language instructions |
+| 🔍 **AI Upscaling** | Improve image resolution with `2x` and `4x` upscale options |
+| 📐 **Flexible Output Controls** | Choose aspect ratios like `1:1`, `16:9`, `9:16`, `4:3`, and `3:4` |
+| ⚡ **Quality and Batch Options** | Use `Auto`, `Low`, `High`, or `HD` presets and generate up to 4 images on supported models |
+| 🌐 **OpenAI-Compatible API** | Work with familiar `/v1/images/*` and `/v1/models` endpoints |
+| 🖼️ **Preview and Download** | Review results in the UI and save generated assets locally |
 
-### 🔍 Upscale
+## 🛠️ Supported Models
 
-Enhance image resolution up to 4x.
+| Model | Provider | Type | Notes |
+| ----- | -------- | ---- | ----- |
+| `nano-banana` | nano-banana-editor | Generate / Edit | Default model, max 1 image |
+| `imagen-4.0-ultra-generate-001` | Google | Generate | Highest quality, max 4 images |
+| `imagen-4.0-generate-001` | Google | Generate | High quality, max 4 images |
+| `imagen-4.0-fast-generate-001` | Google | Generate | Fast generation, max 4 images |
+| `imagen-4.0-upscale-preview` | Google | Upscale | Supports `x2` and `x4` |
 
-- Upscale factors: 2x, 4x
-- Supports URL or file upload
-- Uses Google's `imagen-4.0-upscale-preview`
-
-## Supported Models
-
-| Model                           | Provider           | Type          | Notes                  |
-| ------------------------------- | ------------------ | ------------- | ---------------------- |
-| `nano-banana`                   | nano-banana-editor | Generate/Edit | Default, max 1 image   |
-| `imagen-4.0-ultra-generate-001` | Google             | Generate      | Highest quality, max 4 |
-| `imagen-4.0-generate-001`       | Google             | Generate      | High quality, max 4    |
-| `imagen-4.0-fast-generate-001`  | Google             | Generate      | Fast, max 4            |
-| `imagen-4.0-upscale-preview`    | Google             | Upscale       | 2x/4x                  |
-
-## API
+## 🧩 Supported Endpoints
 
 **Base URL:** `https://nanobanana.aikit.club`
 
-| Endpoint                 | Method | Description                 |
-| ------------------------ | ------ | --------------------------- |
-| `/v1/images/generations` | POST   | Generate images from prompt |
-| `/v1/images/edits`       | POST   | Edit existing images        |
-| `/v1/images/upscale`     | POST   | Upscale image resolution    |
-| `/v1/models`             | GET    | List available models       |
+| Endpoint | Method | Description |
+| -------- | ------ | ----------- |
+| `/v1/models` | `GET` | List available models |
+| `/v1/images/generations` | `GET`, `POST` | Generate images from a text prompt |
+| `/v1/images/edits` | `GET`, `POST` | Edit an existing image |
+| `/v1/images/upscale` | `GET`, `POST` | Upscale image resolution |
 
-📖 **Full API Docs:** [nano-banana-api.readme.io](https://nano-banana-api.readme.io/)
+## 🚀 Quick Start
 
-## Stack
-
-- **React 18** — UI library
-- **TypeScript** — Type safety
-- **Vite** — Build tool
-- **Tailwind CSS** — Styling
-- **shadcn/ui** — Component library
-- **TanStack Query** — Data fetching
-- **React Router** — Routing
-
-## Setup
+### Run the demo locally
 
 ```bash
 git clone https://github.com/tanu360/nanobananademo.git
@@ -74,11 +84,102 @@ npm install
 npm run dev
 ```
 
-## Scripts
+### Build for production
 
-| Command           | Description      |
-| ----------------- | ---------------- |
-| `npm run dev`     | Start dev server |
-| `npm run build`   | Production build |
-| `npm run lint`    | Run ESLint       |
-| `npm run preview` | Preview build    |
+```bash
+npm run build
+npm run preview
+```
+
+## 💡 Usage Examples
+
+### Generate images
+
+```javascript
+const response = await fetch("https://nanobanana.aikit.club/v1/images/generations", {
+  method: "POST",
+  headers: {
+    "Content-Type": "application/json",
+  },
+  body: JSON.stringify({
+    prompt: "A serene mountain landscape at sunset",
+    model: "imagen-4.0-generate-001",
+    n: 1,
+    size: "1:1",
+    quality: "auto",
+    response_format: "url",
+  }),
+});
+```
+
+### Edit an image
+
+```javascript
+const response = await fetch("https://nanobanana.aikit.club/v1/images/edits", {
+  method: "POST",
+  headers: {
+    "Content-Type": "application/json",
+  },
+  body: JSON.stringify({
+    prompt: "Add a rainbow in the sky",
+    image: "https://example.com/image.png",
+    response_format: "url",
+  }),
+});
+```
+
+### Edit an uploaded image
+
+```javascript
+const formData = new FormData();
+formData.append("prompt", "Turn this into a cinematic poster");
+formData.append("image", file);
+
+const response = await fetch("https://nanobanana.aikit.club/v1/images/edits", {
+  method: "POST",
+  body: formData,
+});
+```
+
+### Upscale an image
+
+```javascript
+const response = await fetch("https://nanobanana.aikit.club/v1/images/upscale", {
+  method: "POST",
+  headers: {
+    "Content-Type": "application/json",
+  },
+  body: JSON.stringify({
+    image: "https://example.com/image.png",
+    upscale_factor: "x4",
+    response_format: "url",
+  }),
+});
+```
+
+### List models
+
+```javascript
+const response = await fetch("https://nanobanana.aikit.club/v1/models");
+const models = await response.json();
+```
+
+## ⚙️ Stack
+
+- **React 18** for the UI
+- **TypeScript** for type safety
+- **Vite** for development and builds
+- **Tailwind CSS** for styling
+- **shadcn/ui** for UI primitives
+- **TanStack Query** for data fetching
+- **React Router** for routing
+
+## 📜 Scripts
+
+| Command | Description |
+| ------- | ----------- |
+| `npm run dev` | Start the local dev server |
+| `npm run build` | Create a production build |
+| `npm run build:dev` | Build in development mode |
+| `npm run lint` | Run ESLint |
+| `npm run preview` | Preview the production build |
