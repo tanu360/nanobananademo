@@ -1,0 +1,1089 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "Nano Banana API",
+    "description": "OpenAI-compatible image API backed by the Nano Banana worker. Generation and editing support nano-banana only; upscale is exposed through the dedicated upscale endpoint.",
+    "version": "2.3.0",
+    "contact": {
+      "name": "Nano Banana Support",
+      "url": "https://nanobanana.aikit.club"
+    }
+  },
+  "servers": [
+    {
+      "url": "https://nanobanana.aikit.club",
+      "description": "Production server"
+    }
+  ],
+  "paths": {
+    "/v1/models": {
+      "get": {
+        "summary": "List models",
+        "description": "Retrieve the worker-supported model IDs. Generation and edit requests accept nano-banana only.",
+        "operationId": "listModels",
+        "tags": [
+          "Models"
+        ],
+        "responses": {
+          "200": {
+            "description": "List of available models",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ModelList"
+                },
+                "example": {
+                  "object": "list",
+                  "data": [
+                    {
+                      "id": "nano-banana",
+                      "object": "model",
+                      "created": 1764671202,
+                      "owned_by": "google"
+                    },
+                    {
+                      "id": "imagen-4.0-upscale-preview",
+                      "object": "model",
+                      "created": 1764671202,
+                      "owned_by": "google"
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/images/generations": {
+      "post": {
+        "summary": "Generate image",
+        "description": "Create one or more images from a text prompt using nano-banana.",
+        "operationId": "generateImage",
+        "tags": [
+          "Images"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/GenerationRequest"
+              },
+              "example": {
+                "prompt": "A serene mountain landscape at sunset",
+                "model": "nano-banana",
+                "n": 1,
+                "aspect_ratio": "1:1",
+                "output_format": "png",
+                "response_format": "url"
+              }
+            },
+            "multipart/form-data": {
+              "schema": {
+                "$ref": "#/components/schemas/GenerationRequest"
+              }
+            },
+            "application/x-www-form-urlencoded": {
+              "schema": {
+                "$ref": "#/components/schemas/GenerationRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Image generated successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ImageResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "500": {
+            "$ref": "#/components/responses/ServerError"
+          },
+          "504": {
+            "$ref": "#/components/responses/Timeout"
+          }
+        }
+      },
+      "get": {
+        "summary": "Generate image (GET)",
+        "description": "Create one or more images from a text prompt using query parameters.",
+        "operationId": "generateImageGet",
+        "tags": [
+          "Images"
+        ],
+        "parameters": [
+          {
+            "name": "prompt",
+            "in": "query",
+            "required": true,
+            "description": "Text prompt for the image to generate.",
+            "schema": {
+              "type": "string",
+              "minLength": 1
+            },
+            "example": "A serene mountain landscape at sunset"
+          },
+          {
+            "name": "model",
+            "in": "query",
+            "required": false,
+            "description": "Generation model. Only nano-banana is supported.",
+            "schema": {
+              "type": "string",
+              "description": "Model to use. This worker supports nano-banana for generation and editing.",
+              "enum": [
+                "nano-banana"
+              ],
+              "default": "nano-banana"
+            }
+          },
+          {
+            "name": "n",
+            "in": "query",
+            "required": false,
+            "description": "Number of images to generate.",
+            "schema": {
+              "type": "integer",
+              "description": "Number of images to request.",
+              "minimum": 1,
+              "maximum": 4,
+              "default": 1
+            }
+          },
+          {
+            "name": "size",
+            "in": "query",
+            "required": false,
+            "description": "OpenAI-compatible legacy size parameter. Prefer aspect_ratio for Nano Banana. Known mappings: 1024x1024 -> 1:1, 1792x1024 -> 16:9, 1024x1792 -> 9:16, 768x1024 -> 3:4, 1024x768 -> 4:3.",
+            "schema": {
+              "type": "string",
+              "description": "OpenAI-compatible legacy size parameter. Prefer aspect_ratio for Nano Banana. Known mappings: 1024x1024 -> 1:1, 1792x1024 -> 16:9, 1024x1792 -> 9:16, 768x1024 -> 3:4, 1024x768 -> 4:3.",
+              "enum": [
+                "1024x1024",
+                "1792x1024",
+                "1024x1792",
+                "768x1024",
+                "1024x768"
+              ],
+              "default": "1024x1024"
+            }
+          },
+          {
+            "name": "aspect_ratio",
+            "in": "query",
+            "required": false,
+            "description": "Aspect ratio for generated images.",
+            "schema": {
+              "type": "string",
+              "description": "Aspect ratio. Supported values are exactly the ratios accepted by the worker.",
+              "enum": [
+                "1:1",
+                "16:9",
+                "9:16",
+                "3:4",
+                "4:3"
+              ],
+              "default": "1:1"
+            }
+          },
+          {
+            "name": "output_format",
+            "in": "query",
+            "required": false,
+            "description": "Output image format.",
+            "schema": {
+              "type": "string",
+              "description": "Generated output image format. This maps to the worker output_format parameter.",
+              "enum": [
+                "jpeg",
+                "png",
+                "webp"
+              ],
+              "default": "png"
+            }
+          },
+          {
+            "name": "response_format",
+            "in": "query",
+            "required": false,
+            "description": "Response format. Use url for a worker-hosted image URL, or b64_json for base64 image data.",
+            "schema": {
+              "type": "string",
+              "description": "Response format. Use url for a worker-hosted image URL, or b64_json for base64 image data.",
+              "enum": [
+                "url",
+                "b64_json"
+              ],
+              "default": "url"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Image generated successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ImageResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "500": {
+            "$ref": "#/components/responses/ServerError"
+          },
+          "504": {
+            "$ref": "#/components/responses/Timeout"
+          }
+        }
+      }
+    },
+    "/v1/images/edits": {
+      "post": {
+        "summary": "Edit image",
+        "description": "Modify an existing image from a URL, base64 string, or uploaded file using nano-banana.",
+        "operationId": "editImage",
+        "tags": [
+          "Images"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/EditRequest"
+              },
+              "example": {
+                "prompt": "Add a rainbow in the sky",
+                "image": "https://example.com/image.png",
+                "model": "nano-banana",
+                "n": 1,
+                "aspect_ratio": "1:1",
+                "response_format": "url"
+              }
+            },
+            "multipart/form-data": {
+              "schema": {
+                "$ref": "#/components/schemas/EditRequestFormData"
+              }
+            },
+            "application/x-www-form-urlencoded": {
+              "schema": {
+                "$ref": "#/components/schemas/EditRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Image edited successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ImageResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "500": {
+            "$ref": "#/components/responses/ServerError"
+          },
+          "504": {
+            "$ref": "#/components/responses/Timeout"
+          }
+        }
+      },
+      "get": {
+        "summary": "Edit image (GET)",
+        "description": "Modify an existing image using query parameters. Image must be provided as a URL.",
+        "operationId": "editImageGet",
+        "tags": [
+          "Images"
+        ],
+        "parameters": [
+          {
+            "name": "prompt",
+            "in": "query",
+            "required": true,
+            "description": "Text instruction for editing the image.",
+            "schema": {
+              "type": "string",
+              "minLength": 1
+            },
+            "example": "Add a rainbow in the sky"
+          },
+          {
+            "name": "image",
+            "in": "query",
+            "required": true,
+            "description": "Image URL to edit.",
+            "schema": {
+              "type": "string",
+              "format": "uri"
+            },
+            "example": "https://example.com/image.png"
+          },
+          {
+            "name": "model",
+            "in": "query",
+            "required": false,
+            "description": "Edit model. Only nano-banana is documented for this worker.",
+            "schema": {
+              "type": "string",
+              "description": "Model to use. This worker supports nano-banana for generation and editing.",
+              "enum": [
+                "nano-banana"
+              ],
+              "default": "nano-banana"
+            }
+          },
+          {
+            "name": "n",
+            "in": "query",
+            "required": false,
+            "description": "Number of edited images to request.",
+            "schema": {
+              "type": "integer",
+              "description": "Number of images to request.",
+              "minimum": 1,
+              "maximum": 4,
+              "default": 1
+            }
+          },
+          {
+            "name": "size",
+            "in": "query",
+            "required": false,
+            "description": "OpenAI-compatible legacy size parameter. Prefer aspect_ratio for Nano Banana. Known mappings: 1024x1024 -> 1:1, 1792x1024 -> 16:9, 1024x1792 -> 9:16, 768x1024 -> 3:4, 1024x768 -> 4:3.",
+            "schema": {
+              "type": "string",
+              "description": "OpenAI-compatible legacy size parameter. Prefer aspect_ratio for Nano Banana. Known mappings: 1024x1024 -> 1:1, 1792x1024 -> 16:9, 1024x1792 -> 9:16, 768x1024 -> 3:4, 1024x768 -> 4:3.",
+              "enum": [
+                "1024x1024",
+                "1792x1024",
+                "1024x1792",
+                "768x1024",
+                "1024x768"
+              ],
+              "default": "1024x1024"
+            }
+          },
+          {
+            "name": "aspect_ratio",
+            "in": "query",
+            "required": false,
+            "description": "Aspect ratio for edited images.",
+            "schema": {
+              "type": "string",
+              "description": "Aspect ratio. Supported values are exactly the ratios accepted by the worker.",
+              "enum": [
+                "1:1",
+                "16:9",
+                "9:16",
+                "3:4",
+                "4:3"
+              ],
+              "default": "1:1"
+            }
+          },
+          {
+            "name": "response_format",
+            "in": "query",
+            "required": false,
+            "description": "Response format. Use url for a worker-hosted image URL, or b64_json for base64 image data.",
+            "schema": {
+              "type": "string",
+              "description": "Response format. Use url for a worker-hosted image URL, or b64_json for base64 image data.",
+              "enum": [
+                "url",
+                "b64_json"
+              ],
+              "default": "url"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Image edited successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ImageResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "500": {
+            "$ref": "#/components/responses/ServerError"
+          },
+          "504": {
+            "$ref": "#/components/responses/Timeout"
+          }
+        }
+      }
+    },
+    "/v1/images/upscale": {
+      "post": {
+        "summary": "Upscale image",
+        "description": "Increase image resolution using the worker upscale backend. Supports x2 and x4 upscale factors.",
+        "operationId": "upscaleImage",
+        "tags": [
+          "Images"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpscaleRequest"
+              },
+              "example": {
+                "image": "https://example.com/image.png",
+                "upscale_factor": "x2",
+                "response_format": "url"
+              }
+            },
+            "multipart/form-data": {
+              "schema": {
+                "$ref": "#/components/schemas/UpscaleRequestFormData"
+              }
+            },
+            "application/x-www-form-urlencoded": {
+              "schema": {
+                "$ref": "#/components/schemas/UpscaleRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Image upscaled successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ImageResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "500": {
+            "$ref": "#/components/responses/ServerError"
+          },
+          "504": {
+            "$ref": "#/components/responses/Timeout"
+          }
+        }
+      },
+      "get": {
+        "summary": "Upscale image (GET)",
+        "description": "Upscale an image using query parameters. Image must be provided as a URL.",
+        "operationId": "upscaleImageGet",
+        "tags": [
+          "Images"
+        ],
+        "parameters": [
+          {
+            "name": "image",
+            "in": "query",
+            "required": true,
+            "description": "Image URL to upscale.",
+            "schema": {
+              "type": "string",
+              "format": "uri"
+            },
+            "example": "https://example.com/image.png"
+          },
+          {
+            "name": "upscale_factor",
+            "in": "query",
+            "required": false,
+            "description": "Upscale factor supported by the worker.",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "x2",
+                "x4"
+              ],
+              "default": "x2"
+            }
+          },
+          {
+            "name": "response_format",
+            "in": "query",
+            "required": false,
+            "description": "Response format. Use url for a worker-hosted image URL, or b64_json for base64 image data.",
+            "schema": {
+              "type": "string",
+              "description": "Response format. Use url for a worker-hosted image URL, or b64_json for base64 image data.",
+              "enum": [
+                "url",
+                "b64_json"
+              ],
+              "default": "url"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Image upscaled successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ImageResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "500": {
+            "$ref": "#/components/responses/ServerError"
+          },
+          "504": {
+            "$ref": "#/components/responses/Timeout"
+          }
+        }
+      }
+    },
+    "/images/{filename}": {
+      "get": {
+        "summary": "Serve stored image",
+        "description": "Return an image stored in the worker R2 bucket.",
+        "operationId": "serveImage",
+        "tags": [
+          "Images"
+        ],
+        "parameters": [
+          {
+            "name": "filename",
+            "in": "path",
+            "required": true,
+            "description": "Stored image filename returned by url responses.",
+            "schema": {
+              "type": "string"
+            },
+            "example": "130708-24112025_abcd_generate.png"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Image binary",
+            "content": {
+              "image/png": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              },
+              "image/jpeg": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              },
+              "image/webp": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              }
+            }
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "500": {
+            "$ref": "#/components/responses/ServerError"
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "ModelList": {
+        "type": "object",
+        "properties": {
+          "object": {
+            "type": "string",
+            "example": "list"
+          },
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Model"
+            }
+          }
+        }
+      },
+      "Model": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Model identifier returned by the worker.",
+            "enum": [
+              "nano-banana",
+              "imagen-4.0-upscale-preview"
+            ],
+            "example": "nano-banana"
+          },
+          "object": {
+            "type": "string",
+            "example": "model"
+          },
+          "created": {
+            "type": "integer",
+            "description": "Unix timestamp of model creation.",
+            "example": 1764671202
+          },
+          "owned_by": {
+            "type": "string",
+            "description": "Organization that owns the model.",
+            "example": "google"
+          }
+        }
+      },
+      "GenerationRequest": {
+        "type": "object",
+        "required": [
+          "prompt"
+        ],
+        "properties": {
+          "prompt": {
+            "type": "string",
+            "description": "Text prompt for the image to generate.",
+            "minLength": 1,
+            "maxLength": 4096,
+            "example": "A serene mountain landscape at sunset"
+          },
+          "model": {
+            "type": "string",
+            "description": "Model to use. This worker supports nano-banana for generation and editing.",
+            "enum": [
+              "nano-banana"
+            ],
+            "default": "nano-banana"
+          },
+          "n": {
+            "type": "integer",
+            "description": "Number of images to request.",
+            "minimum": 1,
+            "maximum": 4,
+            "default": 1
+          },
+          "size": {
+            "type": "string",
+            "description": "OpenAI-compatible legacy size parameter. Prefer aspect_ratio for Nano Banana. Known mappings: 1024x1024 -> 1:1, 1792x1024 -> 16:9, 1024x1792 -> 9:16, 768x1024 -> 3:4, 1024x768 -> 4:3.",
+            "enum": [
+              "1024x1024",
+              "1792x1024",
+              "1024x1792",
+              "768x1024",
+              "1024x768"
+            ],
+            "default": "1024x1024"
+          },
+          "aspect_ratio": {
+            "type": "string",
+            "description": "Aspect ratio. Supported values are exactly the ratios accepted by the worker.",
+            "enum": [
+              "1:1",
+              "16:9",
+              "9:16",
+              "3:4",
+              "4:3"
+            ],
+            "default": "1:1"
+          },
+          "output_format": {
+            "type": "string",
+            "description": "Generated output image format. This maps to the worker output_format parameter.",
+            "enum": [
+              "jpeg",
+              "png",
+              "webp"
+            ],
+            "default": "png"
+          },
+          "response_format": {
+            "type": "string",
+            "description": "Response format. Use url for a worker-hosted image URL, or b64_json for base64 image data.",
+            "enum": [
+              "url",
+              "b64_json"
+            ],
+            "default": "url"
+          }
+        }
+      },
+      "EditRequest": {
+        "type": "object",
+        "required": [
+          "prompt",
+          "image"
+        ],
+        "properties": {
+          "prompt": {
+            "type": "string",
+            "description": "Text instruction for editing the image.",
+            "minLength": 1,
+            "example": "Add a rainbow in the sky"
+          },
+          "image": {
+            "type": "string",
+            "description": "Image input as a URL, data:image base64 string, or raw base64 string. Supported MIME types: image/jpeg, image/jpg, image/png, image/gif, image/webp, image/bmp.",
+            "example": "https://example.com/image.png"
+          },
+          "model": {
+            "type": "string",
+            "description": "Model to use. This worker supports nano-banana for generation and editing.",
+            "enum": [
+              "nano-banana"
+            ],
+            "default": "nano-banana"
+          },
+          "n": {
+            "type": "integer",
+            "description": "Number of images to request.",
+            "minimum": 1,
+            "maximum": 4,
+            "default": 1
+          },
+          "size": {
+            "type": "string",
+            "description": "OpenAI-compatible legacy size parameter. Prefer aspect_ratio for Nano Banana. Known mappings: 1024x1024 -> 1:1, 1792x1024 -> 16:9, 1024x1792 -> 9:16, 768x1024 -> 3:4, 1024x768 -> 4:3.",
+            "enum": [
+              "1024x1024",
+              "1792x1024",
+              "1024x1792",
+              "768x1024",
+              "1024x768"
+            ],
+            "default": "1024x1024"
+          },
+          "aspect_ratio": {
+            "type": "string",
+            "description": "Aspect ratio. Supported values are exactly the ratios accepted by the worker.",
+            "enum": [
+              "1:1",
+              "16:9",
+              "9:16",
+              "3:4",
+              "4:3"
+            ],
+            "default": "1:1"
+          },
+          "response_format": {
+            "type": "string",
+            "description": "Response format. Use url for a worker-hosted image URL, or b64_json for base64 image data.",
+            "enum": [
+              "url",
+              "b64_json"
+            ],
+            "default": "url"
+          }
+        }
+      },
+      "EditRequestFormData": {
+        "type": "object",
+        "required": [
+          "prompt",
+          "image"
+        ],
+        "properties": {
+          "prompt": {
+            "type": "string",
+            "description": "Text instruction for editing the image.",
+            "minLength": 1,
+            "example": "Add a rainbow in the sky"
+          },
+          "image": {
+            "type": "string",
+            "format": "binary",
+            "description": "Image file upload. Supported MIME types: image/jpeg, image/jpg, image/png, image/gif, image/webp, image/bmp."
+          },
+          "model": {
+            "type": "string",
+            "description": "Model to use. This worker supports nano-banana for generation and editing.",
+            "enum": [
+              "nano-banana"
+            ],
+            "default": "nano-banana"
+          },
+          "n": {
+            "type": "integer",
+            "description": "Number of images to request.",
+            "minimum": 1,
+            "maximum": 4,
+            "default": 1
+          },
+          "size": {
+            "type": "string",
+            "description": "OpenAI-compatible legacy size parameter. Prefer aspect_ratio for Nano Banana. Known mappings: 1024x1024 -> 1:1, 1792x1024 -> 16:9, 1024x1792 -> 9:16, 768x1024 -> 3:4, 1024x768 -> 4:3.",
+            "enum": [
+              "1024x1024",
+              "1792x1024",
+              "1024x1792",
+              "768x1024",
+              "1024x768"
+            ],
+            "default": "1024x1024"
+          },
+          "aspect_ratio": {
+            "type": "string",
+            "description": "Aspect ratio. Supported values are exactly the ratios accepted by the worker.",
+            "enum": [
+              "1:1",
+              "16:9",
+              "9:16",
+              "3:4",
+              "4:3"
+            ],
+            "default": "1:1"
+          },
+          "response_format": {
+            "type": "string",
+            "description": "Response format. Use url for a worker-hosted image URL, or b64_json for base64 image data.",
+            "enum": [
+              "url",
+              "b64_json"
+            ],
+            "default": "url"
+          }
+        }
+      },
+      "UpscaleRequest": {
+        "type": "object",
+        "required": [
+          "image"
+        ],
+        "properties": {
+          "image": {
+            "type": "string",
+            "description": "Image input as a URL, data:image base64 string, or raw base64 string. Supported MIME types: image/jpeg, image/jpg, image/png, image/gif, image/webp, image/bmp.",
+            "example": "https://example.com/image.png"
+          },
+          "upscale_factor": {
+            "type": "string",
+            "description": "Upscale factor.",
+            "enum": [
+              "x2",
+              "x4"
+            ],
+            "default": "x2"
+          },
+          "response_format": {
+            "type": "string",
+            "description": "Response format. Use url for a worker-hosted image URL, or b64_json for base64 image data.",
+            "enum": [
+              "url",
+              "b64_json"
+            ],
+            "default": "url"
+          }
+        }
+      },
+      "UpscaleRequestFormData": {
+        "type": "object",
+        "required": [
+          "image"
+        ],
+        "properties": {
+          "image": {
+            "type": "string",
+            "format": "binary",
+            "description": "Image file upload. Supported MIME types: image/jpeg, image/jpg, image/png, image/gif, image/webp, image/bmp."
+          },
+          "upscale_factor": {
+            "type": "string",
+            "description": "Upscale factor.",
+            "enum": [
+              "x2",
+              "x4"
+            ],
+            "default": "x2"
+          },
+          "response_format": {
+            "type": "string",
+            "description": "Response format. Use url for a worker-hosted image URL, or b64_json for base64 image data.",
+            "enum": [
+              "url",
+              "b64_json"
+            ],
+            "default": "url"
+          }
+        }
+      },
+      "ImageResponse": {
+        "type": "object",
+        "properties": {
+          "created": {
+            "type": "integer",
+            "description": "Unix timestamp of response creation.",
+            "example": 1764671202
+          },
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ImageData"
+            }
+          }
+        }
+      },
+      "ImageData": {
+        "type": "object",
+        "properties": {
+          "url": {
+            "type": "string",
+            "description": "Worker-hosted image URL returned when response_format is 'url'.",
+            "example": "https://nanobanana.aikit.club/images/130708-24112025_abcd_generate.png"
+          },
+          "b64_json": {
+            "type": "string",
+            "description": "Base64 image data returned when response_format is 'b64_json'. Upscale responses may include a data:image/jpeg;base64 prefix.",
+            "example": "iVBORw0KGgoAAAANSUhEUgAAA..."
+          },
+          "revised_prompt": {
+            "type": "string",
+            "description": "Prompt used for the image operation.",
+            "example": "A serene mountain landscape at sunset"
+          }
+        }
+      },
+      "Error": {
+        "type": "object",
+        "properties": {
+          "error": {
+            "type": "object",
+            "properties": {
+              "message": {
+                "type": "string",
+                "description": "Error message."
+              },
+              "type": {
+                "type": "string",
+                "description": "Error type.",
+                "example": "invalid_request_error"
+              },
+              "param": {
+                "type": "string",
+                "nullable": true
+              },
+              "code": {
+                "type": "string",
+                "nullable": true
+              }
+            }
+          }
+        }
+      }
+    },
+    "responses": {
+      "BadRequest": {
+        "description": "Invalid request parameters",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/Error"
+            },
+            "example": {
+              "error": {
+                "message": "Missing or invalid required parameter: prompt",
+                "type": "invalid_request_error",
+                "param": null,
+                "code": null
+              }
+            }
+          }
+        }
+      },
+      "NotFound": {
+        "description": "Requested image or page was not found",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/Error"
+            },
+            "example": {
+              "error": {
+                "message": "Image not found or expired",
+                "type": "invalid_request_error",
+                "param": null,
+                "code": null
+              }
+            }
+          }
+        }
+      },
+      "ServerError": {
+        "description": "Internal server or upstream API error",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/Error"
+            },
+            "example": {
+              "error": {
+                "message": "Upstream API error: 500 - Internal server error",
+                "type": "api_error",
+                "param": null,
+                "code": null
+              }
+            }
+          }
+        }
+      },
+      "Timeout": {
+        "description": "Upstream polling timeout",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/Error"
+            },
+            "example": {
+              "error": {
+                "message": "Server polling timeout",
+                "type": "api_error",
+                "param": null,
+                "code": null
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "tags": [
+    {
+      "name": "Models",
+      "description": "Operations related to worker-supported models."
+    },
+    {
+      "name": "Images",
+      "description": "Image generation, editing, upscaling, and image serving operations."
+    }
+  ]
+}

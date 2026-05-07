@@ -1,0 +1,376 @@
+import { useState, useRef, useCallback, useEffect } from "react";
+import { ReactCompareSlider, ReactCompareSliderImage, ReactCompareSliderHandle } from "react-compare-slider";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Card } from "@/components/ui/card";
+import { Loader2, ZoomIn, Upload, Link, Download, X, ImagePlus } from "lucide-react";
+import { upscaleImage, type ImageData } from "@/lib/api";
+import { toast } from "@/hooks/use-toast";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { OptionCard } from "@/components/OptionCard";
+import { preloadImage } from "@/lib/imageCache";
+import { saveToHistory } from "@/lib/imageHistory";
+import { cn } from "@/lib/utils";
+
+const MAX_FILE_SIZE = 16 * 1024 * 1024; // 16MB
+const ALLOWED_TYPES = ["image/jpeg", "image/png", "image/gif", "image/webp"];
+
+// Convert image to JPG using canvas
+async function convertImageToJpg(src: string): Promise<string> {
+  return new Promise((resolve, reject) => {
+    const img = new Image();
+    img.crossOrigin = "anonymous";
+    img.onload = () => {
+      const canvas = document.createElement("canvas");
+      canvas.width = img.width;
+      canvas.height = img.height;
+      const ctx = canvas.getContext("2d");
+      if (!ctx) {
+        reject(new Error("Failed to get canvas context"));
+        return;
+      }
+      ctx.drawImage(img, 0, 0);
+      resolve(canvas.toDataURL("image/jpeg", 1));
+    };
+    img.onerror = () => reject(new Error("Failed to load image"));
+    img.src = src;
+  });
+}
+
+// Check if image is WebP (by URL extension or data URL mime type)
+function isWebpImage(src: string): boolean {
+  if (src.startsWith("data:image/webp")) return true;
+  const url = src.toLowerCase();
+  return url.includes(".webp") || url.includes("format=webp") || url.includes("f=webp");
+}
+
+const UPSCALE_FACTORS = [
+  { value: "x2", label: "2x", description: "2K Resolution" },
+  { value: "x4", label: "4x", description: "4K Resolution" },
+];
+
+interface UpscaleTabProps {
+  initialData?: { imageUrl: string } | null;
+  onInitialDataConsumed?: () => void;
+  onLoad?: () => void;
+}
+
+export function UpscaleTab({ initialData, onInitialDataConsumed, onLoad }: UpscaleTabProps) {
+  const [imageUrl, setImageUrl] = useState("");
+  const [uploadedImage, setUploadedImage] = useState<string | null>(null);
+  const [uploadedFileInfo, setUploadedFileInfo] = useState<{ name: string; size: string } | null>(null);
+  const [imageSource, setImageSource] = useState<"url" | "upload">("url");
+  const [upscaleFactor, setUpscaleFactor] = useState<"x2" | "x4">("x2");
+  const [loading, setLoading] = useState(false);
+  const [result, setResult] = useState<ImageData | null>(null);
+  const [isDragging, setIsDragging] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  // Notify parent that tab is loaded (only on mount)
+  useEffect(() => {
+    onLoad?.();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // Handle initial data from history
+  useEffect(() => {
+    if (initialData) {
+      setImageUrl(initialData.imageUrl);
+      setImageSource("url");
+      setResult(null);
+      onInitialDataConsumed?.();
+      toast({ title: "Image loaded from history" });
+    }
+  }, [initialData, onInitialDataConsumed]);
+
+  const formatFileSize = (bytes: number) => {
+    if (bytes < 1024) return bytes + " B";
+    if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + " KB";
+    return (bytes / (1024 * 1024)).toFixed(1) + " MB";
+  };
+
+  const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (!ALLOWED_TYPES.includes(file.type)) {
+      toast({ title: "Only JPG, PNG, GIF, WebP formats are supported", variant: "destructive" });
+      return;
+    }
+
+    if (file.size > MAX_FILE_SIZE) {
+      toast({ title: "File size must be less than 16MB", variant: "destructive" });
+      return;
+    }
+
+    setUploadedFileInfo({ name: file.name, size: formatFileSize(file.size) });
+
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      setUploadedImage(event.target?.result as string);
+      setImageSource("upload");
+    };
+    reader.readAsDataURL(file);
+  };
+
+  const handleUpscale = async () => {
+    let imageToUpscale = imageSource === "url" ? imageUrl : uploadedImage;
+    if (!imageToUpscale) {
+      toast({ title: "Please provide an image", variant: "destructive" });
+      return;
+    }
+
+    setLoading(true);
+    try {
+      // Convert WebP to JPG (WebP not supported for full quality upscale)
+      if (isWebpImage(imageToUpscale)) {
+        imageToUpscale = await convertImageToJpg(imageToUpscale);
+      }
+
+      const response = await upscaleImage({
+        image: imageToUpscale,
+        upscale_factor: upscaleFactor,
+        response_format: "url",
+      });
+      setResult(response.data[0]);
+
+      // Preload result image for instant viewing
+      if (response.data[0]?.url) {
+        preloadImage(response.data[0].url);
+        // Save to history with model name
+        saveToHistory("upscale", response.data[0].url, undefined, { model: "nano-banana-upscaler", upscaleFactor });
+      }
+
+      toast({ title: "Image upscaled successfully!" });
+    } catch (error) {
+      toast({
+        title: "Upscale failed",
+        description: error instanceof Error ? error.message : "Unknown error",
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleDownload = async (url: string) => {
+    try {
+      const response = await fetch(url);
+      const blob = await response.blob();
+      const downloadUrl = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = downloadUrl;
+      a.download = `nanobanana-upscaled-${upscaleFactor}-${Date.now()}.png`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(downloadUrl);
+    } catch {
+      toast({ title: "Download failed", variant: "destructive" });
+    }
+  };
+
+  const clearUpload = () => {
+    setUploadedImage(null);
+    setUploadedFileInfo(null);
+    if (fileInputRef.current) {
+      fileInputRef.current.value = "";
+    }
+  };
+
+  // Drag and drop handlers
+  const handleDragOver = useCallback((e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragging(true);
+  }, []);
+
+  const handleDragLeave = useCallback((e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragging(false);
+  }, []);
+
+  const handleDrop = useCallback((e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragging(false);
+
+    const file = e.dataTransfer.files?.[0];
+    if (!file) return;
+
+    if (!ALLOWED_TYPES.includes(file.type)) {
+      toast({ title: "Only JPG, PNG, GIF, WebP formats are supported", variant: "destructive" });
+      return;
+    }
+
+    if (file.size > MAX_FILE_SIZE) {
+      toast({ title: "File size must be less than 16MB", variant: "destructive" });
+      return;
+    }
+
+    setUploadedFileInfo({ name: file.name, size: formatFileSize(file.size) });
+
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      setUploadedImage(event.target?.result as string);
+      setImageSource("upload");
+    };
+    reader.readAsDataURL(file);
+  }, []);
+
+  const previewImage = imageSource === "url" ? imageUrl : uploadedImage;
+  const resultImage = result?.url || (result?.b64_json ? `data:image/png;base64,${result.b64_json}` : null);
+
+  return (
+    <div className="grid gap-6 lg:grid-cols-2">
+      <div className="space-y-6">
+        <Tabs value={imageSource} onValueChange={(v) => setImageSource(v as "url" | "upload")}>
+          <TabsList className="w-full">
+            <TabsTrigger value="url" className="flex-1">
+              <Link className="mr-2 h-4 w-4" />
+              URL
+            </TabsTrigger>
+            <TabsTrigger value="upload" className="flex-1">
+              <Upload className="mr-2 h-4 w-4" />
+              Upload
+            </TabsTrigger>
+          </TabsList>
+
+          <TabsContent value="url" className="mt-4 space-y-2">
+            <Label htmlFor="upscale-url">Image URL</Label>
+            <Input
+              id="upscale-url"
+              type="url"
+              placeholder="https://example.com/image.png"
+              value={imageUrl}
+              onChange={(e) => setImageUrl(e.target.value)}
+              className="rounded-lg"
+            />
+          </TabsContent>
+
+          <TabsContent value="upload" className="mt-4 space-y-2">
+            <Label>Upload Image</Label>
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept=".jpg,.jpeg,.png,.gif,.webp"
+              onChange={handleFileUpload}
+              className="hidden"
+            />
+            <div
+              className={cn(
+                "relative w-full border-2 border-dashed rounded-lg py-4 flex flex-col items-center justify-center cursor-pointer transition-colors",
+                isDragging ? "border-primary bg-primary/10" : "border-border hover:bg-muted/50"
+              )}
+              onClick={() => !uploadedImage && fileInputRef.current?.click()}
+              onDragOver={handleDragOver}
+              onDragLeave={handleDragLeave}
+              onDrop={handleDrop}
+            >
+              {uploadedImage && uploadedFileInfo ? (
+                <>
+                  <Button
+                    size="icon"
+                    variant="destructive"
+                    className="absolute right-2 top-2 h-5 w-5 rounded-full"
+                    onClick={(e) => { e.stopPropagation(); clearUpload(); }}
+                  >
+                    <X className="h-3 w-3" />
+                  </Button>
+                  <Upload className="h-5 w-5 text-muted-foreground mb-1" />
+                  <p className="text-sm font-medium truncate max-w-[200px]">{uploadedFileInfo.name}</p>
+                  <p className="text-xs text-muted-foreground">{uploadedFileInfo.size}</p>
+                </>
+              ) : (
+                <>
+                  <Upload className={cn("h-5 w-5 mb-1", isDragging ? "text-primary" : "text-muted-foreground")} />
+                  <p className={cn("text-xs", isDragging ? "text-primary" : "text-muted-foreground")}>
+                    {isDragging ? "Drop image here" : "Click or drag & drop (max 16MB)"}
+                  </p>
+                </>
+              )}
+            </div>
+          </TabsContent>
+        </Tabs>
+
+        <div className="space-y-3">
+          <Label>Upscale Factor</Label>
+          <div className="grid grid-cols-2 gap-2">
+            {UPSCALE_FACTORS.map((f) => (
+              <OptionCard
+                key={f.value}
+                selected={upscaleFactor === f.value}
+                onClick={() => setUpscaleFactor(f.value as "x2" | "x4")}
+              >
+                <span className="text-sm font-bold">{f.label}</span>
+                <span className="text-xs text-muted-foreground">{f.description}</span>
+              </OptionCard>
+            ))}
+          </div>
+          <p className="text-xs text-muted-foreground">
+            Higher factors produce larger images but take longer
+          </p>
+        </div>
+
+        <Button onClick={handleUpscale} disabled={loading} className="w-full rounded-lg" size="lg">
+          {loading ? (
+            <>
+              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              Upscaling...
+            </>
+          ) : (
+            <>
+              <ZoomIn className="mr-2 h-4 w-4" />
+              Upscale Image
+            </>
+          )}
+        </Button>
+      </div>
+
+      <div className="flex flex-col space-y-2">
+        <Card className={`overflow-hidden rounded-md ${!previewImage ? 'flex-1' : ''}`}>
+          {resultImage && previewImage ? (
+            <div className="relative">
+              <ReactCompareSlider
+                itemOne={<ReactCompareSliderImage src={previewImage} alt="Original" />}
+                itemTwo={<ReactCompareSliderImage src={resultImage} alt="Upscaled" />}
+                handle={
+                  <ReactCompareSliderHandle
+                    buttonStyle={{
+                      backgroundColor: 'white',
+                      border: '2px solid #e5e7eb',
+                      boxShadow: '0 2px 8px rgba(0,0,0,0.15)',
+                      color: '#374151',
+                    }}
+                    linesStyle={{
+                      backgroundColor: 'white',
+                      boxShadow: '0 0 4px rgba(0,0,0,0.2)',
+                    }}
+                  />
+                }
+              />
+              <Button
+                size="icon"
+                className="absolute bottom-3 right-3 h-10 w-10 rounded-full bg-background/90 hover:bg-background text-foreground backdrop-blur-sm z-10"
+                onClick={() => handleDownload(result?.url || "")}
+              >
+                <Download className="h-4 w-4" />
+              </Button>
+            </div>
+          ) : previewImage ? (
+            <div className="relative">
+              <img src={previewImage} alt="Preview" className="w-full h-auto" />
+            </div>
+          ) : (
+            <div className="h-full min-h-[300px] flex flex-col items-center justify-center gap-3 bg-gray-100 dark:bg-muted/30">
+              <ImagePlus className="h-16 w-16 text-gray-400 dark:text-muted-foreground/40" />
+              <p className="text-sm text-gray-500 dark:text-muted-foreground">Upload an image to get started</p>
+            </div>
+          )}
+        </Card>
+      </div>
+    </div>
+  );
+}
